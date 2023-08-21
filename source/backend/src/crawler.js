@@ -1,19 +1,25 @@
 const crawling = require('./crawling');
 const Redis = require("ioredis");
-const { v4: uuidv4 } = require('uuid');
+const {parentPort, workerData} = require('worker_threads');
+const process = require('process');
 
+console.log('process.pid', process.pid);
 
-// const { url, boundaryRegexp } = WorkerData;
-// 'https://www.zelezarstvizizkov.cz/', new RegExp('^http.*')
+const { executionId, url, boundaryRegexp, redisOptions } = workerData;
 
+const redis = new Redis(redisOptions);
 
-const redis = new Redis(6379);
-
-score = 0;
-executionId = 'executionCrawlRecords-' + uuidv4();
+let score = 0;
+let count = 0;
+const startTime = Date.now();
 
 const saveCrawlRecord = async (r) => {
-    await redis.zadd(executionId, ++score, JSON.stringify(r));
+    try {
+        await redis.zadd(executionId, ++score, JSON.stringify(r));
+        ++count;
+    } catch(error) {
+        console.log(error);
+    }
     
 }
 
@@ -25,12 +31,16 @@ const cancel = () => {
     return cancelCrawling;
 }
 
-crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
-.then((x) => { 
-    console.log("WW,", x);
+// crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
+crawling.crawl(url, boundaryRegexp, saveCrawlRecord, cancel)
+.then((finished) => { 
+    const endTime = Date.now();
+
+    parentPort.postMessage({
+        start: startTime,
+        end: endTime,
+        sitesCrawled: count,
+        status: finished ? 'finished' : 'failed'
+    });
     redis.disconnect();
 });
-// crawling.crawl(url, boundaryRegexp, saveCrawlRecord, cancel);
-
-
-

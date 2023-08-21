@@ -33,7 +33,6 @@ async function crawl(website, boundaryRegexp, saveCrawlRecord, cancel) {
         }
     }
 
-    console.log("END??")
     if (alreadyCrawledWebsites.size > 1) {
         return true;
     } else {

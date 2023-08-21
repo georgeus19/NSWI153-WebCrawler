@@ -1,7 +1,28 @@
 const crawling = require('./crawling');
+const { Worker } = require('worker_threads');
+const { v4: uuidv4 } = require('uuid');
+const process = require('process');
+
+console.log('process.pid', process.pid);
 
 
-const stream = require('stream');
+const worker = new Worker(
+    __dirname + '/crawler.js',
+    {
+        workerData: {
+            executionId: 'executionCrawlRecords-' + uuidv4(),
+            url: 'https://www.zelezarstvizizkov.cz/',
+            boundaryRegexp: new RegExp('^http.*'),
+            redisOptions: 6379
+        }
+
+    }
+);
+
+setTimeout(() => {
+    console.log('Hey there');
+}, 3000)
+// while(true);
 
 // let url = new URL('https://www.zelezarstvizizkov.cz/dsdsdd/qqq#ahoj');
 // console.log(url.);
@@ -16,9 +37,6 @@ const stream = require('stream');
 
 // let url5 = new URL('https://www.zelezarstvizizkov.cz/123/', 'https://www.XXXXXXXXx.cz/vyvoj/honimir?a=2');
 // console.log(url5)
-const result = crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'));
-crawlRecordsObs.subscribe(x => x);
-
 
 
 
