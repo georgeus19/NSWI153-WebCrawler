@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export interface CrawlRecord {
     url: string;
-    crawlTime: Date;
+    crawlTime: string;
     title: string;
     links: string[];
 }
@@ -23,7 +23,7 @@ export async function crawl(
             continue;
         }
         alreadyCrawledWebsites.add(websiteToCrawl);
-        console.log('websiteToCrawl', websiteToCrawl);
+        // console.log('websiteToCrawl', websiteToCrawl);
 
         const scrapeResult = await scrape(websiteToCrawl);
         if (cancel()) {
@@ -37,7 +37,7 @@ export async function crawl(
             websitesToCrawlQueue.push(...links.filter((link) => boundaryRegexp.test(link) && !alreadyCrawledWebsites.has(link)));
             await saveCrawlRecord({
                 url: websiteToCrawl,
-                crawlTime: new Date(Date.now()),
+                crawlTime: new Date(Date.now()).toUTCString(),
                 title: scrapeResult.title,
                 links: links,
             });
@@ -56,11 +56,9 @@ function successfulScrape(result: { title: string; links: string[] } | { error: 
 }
 
 async function scrape(webpage: string): Promise<{ title: string; links: string[] } | { error: boolean }> {
-    // const response = await fetch(webpage);
     try {
         const response = await axios.get(webpage, { responseType: 'text' });
         const html: string = response.data;
-        // console.log(response.data);
         const links: string[] = [];
         let title: string = '';
         let titleElement = false;
@@ -95,7 +93,6 @@ async function scrape(webpage: string): Promise<{ title: string; links: string[]
             links: links,
         };
     } catch (error) {
-        console.log(error);
         return { error: true };
     }
 }

@@ -2,19 +2,28 @@ import { CrawlRecord, crawl } from './crawling';
 import Redis, { RedisOptions } from 'ioredis';
 import workerpool from 'workerpool';
 
-interface WorkerInput {
+export interface WorkerInput {
     executionId: string;
     url: string;
     boundaryRegexp: string;
     redisOptions: RedisOptions;
 }
 
-async function runCrawlingExecution(workerInput: WorkerInput) {
+export type CrawlingExecutionStatus = 'finished' | 'failed';
+
+export interface CrawlingExecution {
+    start: string;
+    end: string;
+    sitesCrawled: number;
+    status: CrawlingExecutionStatus;
+}
+
+async function runCrawlingExecution(workerInput: WorkerInput): Promise<CrawlingExecution> {
     const { executionId, url, boundaryRegexp, redisOptions } = workerInput;
     const redis = new Redis(redisOptions);
     let score = 0;
     let count = 0;
-    const startTime = Date.now();
+    const startTime = new Date(Date.now());
 
     const saveCrawlRecord = async (record: CrawlRecord) => {
         try {
@@ -35,11 +44,11 @@ async function runCrawlingExecution(workerInput: WorkerInput) {
 
     // crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
     const finished = await crawl(url, new RegExp(boundaryRegexp), saveCrawlRecord, cancel);
-    const endTime = Date.now();
+    const endTime = new Date(Date.now());
     redis.disconnect();
     return {
-        start: startTime,
-        end: endTime,
+        start: startTime.toUTCString(),
+        end: endTime.toUTCString(),
         sitesCrawled: count,
         status: finished ? 'finished' : 'failed',
     };
