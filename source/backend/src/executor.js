@@ -6,12 +6,12 @@ const workerpool = require('workerpool');
 
 // console.log('process.pid', process.pid);
 
-// const { executionId, url, boundaryRegexp, redisOptions } = workerData;
 
 
 
-async function runCrawlingExecution(redisOptions, executionId, url, boundaryRegexp) {
-    
+
+async function runCrawlingExecution(workerData) {
+    const { executionId, url, boundaryRegexp, redisOptions } = workerData;
     const redis = new Redis(redisOptions);
     let score = 0;
     let count = 0;
@@ -37,19 +37,15 @@ async function runCrawlingExecution(redisOptions, executionId, url, boundaryRege
     // crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
     const finished = await crawling.crawl(url, boundaryRegexp, saveCrawlRecord, cancel);
     const endTime = Date.now();
+    redis.disconnect();
     return {
         start: startTime,
         end: endTime,
         sitesCrawled: count,
         status: finished ? 'finished' : 'failed'
     };
-    // parentPort.postMessage(
-        // .then((finished) => { 
-            //     });
-            // });
-            
         }
         
 workerpool.worker({
-    createCrawlingExecution: runCrawlingExecution
+    runCrawlingExecution: runCrawlingExecution
 });

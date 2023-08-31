@@ -19,11 +19,21 @@ const process = require('process');
 
 const workerpool = require('workerpool');
 
-const pool = workerpool.pool(__dirname + '/executor.js');
-pool.exec('runCrawlingExecution', {
-    executionId: 'executionCrawlRecords-' + uuidv4(),
-    url: 'https://www.zelezarstvizizkov.cz/',
-    boundaryRegexp: new RegExp('^http.*'),
-    redisOptions: 6379
-})
+
+async function main() {
+    const pool = workerpool.pool(__dirname + '/executor.js');
+    await pool.exec('runCrawlingExecution', [{
+        executionId: 'executionCrawlRecords-' + uuidv4(),
+        url: 'https://www.zelezarstvizizkov.cz/',
+        boundaryRegexp: new RegExp('^http.*'),
+        redisOptions: 6379
+    }])
+
+    console.log('xxx');
+    pool.terminate();
+
+}
+
+main();
+
 
