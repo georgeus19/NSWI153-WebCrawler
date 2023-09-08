@@ -1,12 +1,6 @@
 import * as htmlparser2 from 'htmlparser2';
 import axios from 'axios';
-
-export interface CrawlRecord {
-    url: string;
-    crawlTime: string;
-    title: string;
-    links: string[];
-}
+import { CrawlRecord } from '../shared/crawling-execution';
 
 export async function crawl(
     website: string,

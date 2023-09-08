@@ -1,37 +1,38 @@
 {
-  "main": "src/main.ts",
-  "name": "xx",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "rm -rf dist && npx tsc",
-    "eslint:fix": "eslint --fix",
-    "prestart": "npm run build",
-    "start": "node dist/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "axios": "^1.4.0",
-    "body-parser": "^1.20.2",
-    "express": "^4.18.2",
-    "htmlparser2": "^9.0.0",
-    "http-status-codes": "^2.2.0",
-    "ioredis": "^5.3.2",
-    "mongodb": "^6.0.0",
-    "nodemon": "^3.0.1",
-    "rxjs": "^7.8.1",
-    "typescript": "^5.2.2",
-    "uuid": "^9.0.0",
-    "workerpool": "^6.4.2",
-    "zod": "^3.22.2"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^20.5.7",
-    "@types/uuid": "^9.0.3",
-    "@types/workerpool": "^6.4.1",
-    "@typescript-eslint/eslint-plugin": "^6.5.0",
-    "@typescript-eslint/parser": "^6.5.0",
-    "eslint": "^8.48.0",
-    "prettier": "^3.0.3"
-  }
+    "name": "xx",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "rm -rf dist && npx tsc",
+        "eslint:fix": "eslint --fix",
+        "prestart-server": "npm run build",
+        "prestart-executor": "npm run build",
+        "start-server": "node dist/server/main.js",
+        "start-executor": "node dist/crawling-executor/main.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "axios": "^1.4.0",
+        "body-parser": "^1.20.2",
+        "express": "^4.18.2",
+        "htmlparser2": "^9.0.0",
+        "http-status-codes": "^2.2.0",
+        "ioredis": "^5.3.2",
+        "mongodb": "^6.0.0",
+        "nodemon": "^3.0.1",
+        "rxjs": "^7.8.1",
+        "typescript": "^5.2.2",
+        "uuid": "^9.0.0",
+        "workerpool": "^6.4.2",
+        "zod": "^3.22.2"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.17",
+        "@types/node": "^20.5.7",
+        "@types/uuid": "^9.0.3",
+        "@types/workerpool": "^6.4.1",
+        "@typescript-eslint/eslint-plugin": "^6.5.0",
+        "@typescript-eslint/parser": "^6.5.0",
+        "eslint": "^8.48.0",
+        "prettier": "^3.0.3"
+    }
 }

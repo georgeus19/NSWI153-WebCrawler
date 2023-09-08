@@ -1,6 +1,7 @@
-import { CrawlRecord, crawl } from './crawling';
-import Redis, { RedisOptions } from 'ioredis';
+import { crawl } from './crawling';
+import { Redis, RedisOptions } from 'ioredis';
 import workerpool from 'workerpool';
+import { CrawlRecord, FinishedCrawlingExecution } from '../shared/crawling-execution';
 
 export interface WorkerInput {
     executionId: string;
@@ -9,16 +10,7 @@ export interface WorkerInput {
     redisOptions: RedisOptions;
 }
 
-export type CrawlingExecutionStatus = 'finished' | 'failed';
-
-export interface CrawlingExecution {
-    start: string;
-    end: string;
-    sitesCrawled: number;
-    status: CrawlingExecutionStatus;
-}
-
-async function runCrawlingExecution(workerInput: WorkerInput): Promise<CrawlingExecution> {
+async function runCrawlingExecution(workerInput: WorkerInput): Promise<FinishedCrawlingExecution> {
     const { executionId, url, boundaryRegexp, redisOptions } = workerInput;
     const redis = new Redis(redisOptions);
     let score = 0;
