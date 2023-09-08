@@ -1,9 +1,9 @@
 import express from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
-import { getWebsiteRecordsCollection, getCrawlExecutionsCollection } from '../../shared/db-access';
+import { getWebsiteRecordsCollection, getCrawlExecutionsCollection } from '../db-access';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
-import { createExecutionController } from '../crawling-executions-controller';
+import { createExecutionController } from '../controllers/crawling-executions-controller';
 
 export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoClient) {
     const crawlExecutionsPath = '/website-records/crawl-executions';

@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import { getWebsiteRecordsCollection } from '../shared/db-access';
-import { FinishedCrawlingExecution, RunningCrawlingExecution } from '../shared/crawling-execution';
+import { getWebsiteRecordsCollection } from './../db-access';
+import { FinishedCrawlingExecution, RunningCrawlingExecution } from '../crawling-executor/crawling-execution';
 
 export function createExecutionController(mongoClient: MongoClient) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);

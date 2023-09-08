@@ -1,7 +1,7 @@
 import { MongoClient, ObjectId } from 'mongodb';
-import { getWebsiteRecordsCollection } from '../shared/db-access';
-import { WebsiteRecord, StoredWebsiteRecord } from '../shared/website-record';
-import { IdEntity } from '../shared/base-types';
+import { getWebsiteRecordsCollection } from '../db-access';
+import { WebsiteRecord, StoredWebsiteRecord } from '../website-record';
+import { IdEntity } from '../base-types';
 
 export function createWebsiteRecordController(mongoClient: MongoClient) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);

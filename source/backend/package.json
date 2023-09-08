@@ -4,10 +4,8 @@
     "scripts": {
         "build": "rm -rf dist && npx tsc",
         "eslint:fix": "eslint --fix",
-        "prestart-server": "npm run build",
-        "prestart-executor": "npm run build",
-        "start-server": "node dist/server/main.js",
-        "start-executor": "node dist/crawling-executor/main.js",
+        "prestart": "npm run build",
+        "start": "node dist/main.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {

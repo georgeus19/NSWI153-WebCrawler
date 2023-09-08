@@ -1,10 +1,10 @@
 import express from 'express';
 import { MongoClient, ObjectId } from 'mongodb';
-import { getWebsiteRecordsCollection } from '../../shared/db-access';
+import { getWebsiteRecordsCollection } from '../db-access';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
-import { createWebsiteRecordController } from '../website-records-controller';
-import { WebsiteRecord } from '../../shared/website-record';
+import { createWebsiteRecordController } from '../controllers/website-records-controller';
+import { WebsiteRecord } from '../website-record';
 
 export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient) {
     const websiteRecordsPath = '/website-records';

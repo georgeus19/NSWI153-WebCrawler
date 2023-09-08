@@ -1,7 +1,7 @@
 import { crawl } from './crawling';
 import { Redis, RedisOptions } from 'ioredis';
 import workerpool from 'workerpool';
-import { CrawlRecord, FinishedCrawlingExecution } from '../shared/crawling-execution';
+import { CrawlRecord, FinishedCrawlingExecution } from './crawling-execution';
 
 export interface WorkerInput {
     executionId: string;

@@ -1,4 +1,4 @@
-import { FinishedCrawlingExecution, RunningCrawlingExecution } from './crawling-execution';
+import { FinishedCrawlingExecution, RunningCrawlingExecution } from './crawling-executor/crawling-execution';
 
 export interface WebsiteRecord {
     // id: string;
