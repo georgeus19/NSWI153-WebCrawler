@@ -5,8 +5,9 @@ import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { createWebsiteRecordController } from '../controllers/website-records-controller';
 import { WebsiteRecord } from '../website-record';
+import { CrawlingExecutor } from '../crawling-executor/executor';
 
-export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient) {
+export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient, executor: CrawlingExecutor) {
     const websiteRecordsPath = '/website-records';
     const websiteRecordIdParam = 'websiteRecordId';
     const websiteRecordPath = websiteRecordsPath + '/:' + websiteRecordIdParam;

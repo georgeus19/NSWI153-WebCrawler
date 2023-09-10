@@ -24,9 +24,10 @@ export interface CrawlingExecutor {
     start: () => void;
 }
 
-export function createCrawlingExecutor(mongoClient: MongoClient, redis: Redis): CrawlingExecutor {
+export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: RedisOptions): CrawlingExecutor {
     const pool = workerpool.pool(__dirname + '/execution-worker.js');
 
+    const redis = new Redis(redisOptions);
     const executionQueue = new Heap(
         (a: ScheduledExecution, b: ScheduledExecution) => a.scheduledStartTime.getTime() - b.scheduledStartTime.getTime()
     );
