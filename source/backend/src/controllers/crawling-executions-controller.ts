@@ -14,6 +14,7 @@ export function createExecutionController(mongoClient: MongoClient) {
                     executions: {
                         id: executionId,
                         status: 'running',
+                        startTime: Date.now(),
                     },
                 },
             }

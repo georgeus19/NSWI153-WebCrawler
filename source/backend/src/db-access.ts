@@ -2,7 +2,7 @@ import { Collection, MongoClient } from 'mongodb';
 
 const dbName = 'crawler';
 const websiteRecordsCollectionName = 'website-records';
-const crawlExecutionsCollectionName = 'crawl-executions';
+const crawledWebsites = 'crawled-websites';
 
 export function getWebsiteRecordsCollection(client: MongoClient): Collection<Document> {
     const db = client.db(dbName);
@@ -11,5 +11,10 @@ export function getWebsiteRecordsCollection(client: MongoClient): Collection<Doc
 
 export function getCrawlExecutionsCollection(client: MongoClient): Collection<Document> {
     const db = client.db(dbName);
-    return db.collection(crawlExecutionsCollectionName);
+    return db.collection(crawledWebsites);
+}
+
+export function getCrawledWebsitesCollection(client: MongoClient): Collection<Document> {
+    const db = client.db(dbName);
+    return db.collection(crawledWebsites);
 }

@@ -1,19 +1,20 @@
 export interface FinishedCrawlingExecution {
-    start: string;
-    end: string;
+    start: Date;
+    end: Date;
     sitesCrawled: number;
-    status: 'finished' | 'failed';
+    status: 'finished' | 'failed' | 'cancelled';
 }
 
 export interface RunningCrawlingExecution {
     status: 'running';
+    start: Date;
 }
 
-export type CrawlingExecutionStatus = 'finished' | 'failed' | 'running';
+export type CrawlingExecutionStatus = 'finished' | 'failed' | 'running' | 'cancelled';
 
 export interface CrawlRecord {
     url: string;
-    crawlTime: string;
+    crawlTime: Date;
     title: string;
     links: string[];
 }

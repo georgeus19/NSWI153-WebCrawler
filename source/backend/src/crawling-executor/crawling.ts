@@ -1,13 +1,13 @@
 import * as htmlparser2 from 'htmlparser2';
 import axios from 'axios';
-import { CrawlRecord } from './crawling-execution';
+import { CrawlRecord, CrawlingExecutionStatus } from './crawling-execution';
 
 export async function crawl(
     website: string,
     boundaryRegexp: RegExp,
     saveCrawlRecord: (record: CrawlRecord) => Promise<void>,
     cancel: () => boolean
-): Promise<boolean> {
+): Promise<CrawlingExecutionStatus> {
     const websitesToCrawlQueue = [website];
 
     const alreadyCrawledWebsites = new Set();
@@ -21,7 +21,7 @@ export async function crawl(
 
         const scrapeResult = await scrape(websiteToCrawl);
         if (cancel()) {
-            break;
+            return 'cancelled';
         }
         if (successfulScrape(scrapeResult)) {
             const links = scrapeResult.links.map((link) => {
@@ -31,7 +31,7 @@ export async function crawl(
             websitesToCrawlQueue.push(...links.filter((link) => boundaryRegexp.test(link) && !alreadyCrawledWebsites.has(link)));
             await saveCrawlRecord({
                 url: websiteToCrawl,
-                crawlTime: new Date(Date.now()).toUTCString(),
+                crawlTime: new Date(Date.now()),
                 title: scrapeResult.title,
                 links: links,
             });
@@ -39,9 +39,9 @@ export async function crawl(
     }
 
     if (alreadyCrawledWebsites.size > 1) {
-        return true;
+        return 'finished';
     } else {
-        return false;
+        return 'failed';
     }
 }
 

@@ -4,8 +4,9 @@ import { getWebsiteRecordsCollection, getCrawlExecutionsCollection } from '../db
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { createExecutionController } from '../controllers/crawling-executions-controller';
+import { CrawlingExecutor } from '../crawling-executor/executor';
 
-export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoClient) {
+export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoClient, executor: CrawlingExecutor) {
     const crawlExecutionsPath = '/website-records/crawl-executions';
     const crawlExecutionIdParam = 'crawlExecutionId';
     const crawlExecutionPath = crawlExecutionsPath + '/:' + crawlExecutionIdParam;

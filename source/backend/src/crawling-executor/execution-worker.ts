@@ -39,8 +39,8 @@ async function runCrawlingExecution(workerInput: WorkerInput): Promise<FinishedC
     const endTime = new Date(Date.now());
     redis.disconnect();
     return {
-        start: startTime.toUTCString(),
-        end: endTime.toUTCString(),
+        start: startTime,
+        end: endTime,
         sitesCrawled: count,
         status: finished ? 'finished' : 'failed',
     };
