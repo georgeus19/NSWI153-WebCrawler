@@ -37,7 +37,7 @@ export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoCl
 
     app.get('/website-records/:websiteRecordId/crawl-executions', async (request, response) => {
         const executionController = createExecutionController(mongoClient);
-        const executions = await executionController.getExecutions();
+        const executions = await executionController.getExecutions(request.params.websiteRecordId);
         if (executions) {
             response.send(executions);
             response.status(StatusCodes.OK);

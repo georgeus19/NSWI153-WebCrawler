@@ -1,13 +1,13 @@
 import * as htmlparser2 from 'htmlparser2';
 import axios from 'axios';
-import { CrawlRecord, CrawlingExecutionStatus } from './crawling-execution';
+import { CrawlRecord, FinishedCrawlingExecutionStatus } from './crawling-execution';
 
 export async function crawl(
     website: string,
     boundaryRegexp: RegExp,
     saveCrawlRecord: (record: CrawlRecord) => Promise<void>,
     cancel: () => boolean
-): Promise<CrawlingExecutionStatus> {
+): Promise<FinishedCrawlingExecutionStatus> {
     const websitesToCrawlQueue = [website];
 
     const alreadyCrawledWebsites = new Set();
@@ -17,7 +17,7 @@ export async function crawl(
             continue;
         }
         alreadyCrawledWebsites.add(websiteToCrawl);
-        // console.log('websiteToCrawl', websiteToCrawl);
+        console.log('websiteToCrawl', websiteToCrawl);
 
         const scrapeResult = await scrape(websiteToCrawl);
         if (cancel()) {

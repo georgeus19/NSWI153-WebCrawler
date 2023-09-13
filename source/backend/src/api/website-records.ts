@@ -7,7 +7,7 @@ import { createWebsiteRecordController } from '../controllers/website-records-co
 import { WebsiteRecord } from '../website-record';
 import { CrawlingExecutor } from '../crawling-executor/executor';
 
-export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient, executor: CrawlingExecutor) {
+export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
     const websiteRecordsPath = '/website-records';
     const websiteRecordIdParam = 'websiteRecordId';
     const websiteRecordPath = websiteRecordsPath + '/:' + websiteRecordIdParam;
@@ -21,8 +21,8 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         tags: z.array(z.string()),
         // executions: z.array(crawlExecutionSchema).optional(),
     });
+    const websiteRecordController = createWebsiteRecordController(mongoClient, crawlingExecutor);
     app.get(websiteRecordsPath, async (request, response) => {
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         const records = await websiteRecordController.getWebsiteRecords();
 
         response.json(records);
@@ -38,7 +38,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             return;
         }
 
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         const websiteRecord: WebsiteRecord = validationResult.data;
         const recordId = await websiteRecordController.addWebsiteRecord(websiteRecord);
 
@@ -52,7 +51,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
     });
 
     app.delete(websiteRecordsPath, async (request, response) => {
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         if (await websiteRecordController.deleteAllWebsiteRecords()) {
             response.status(StatusCodes.NO_CONTENT);
         } else {
@@ -62,7 +60,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
     });
 
     app.get(websiteRecordPath, async (request, response) => {
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         const websiteRecord = await websiteRecordController.getWebsiteRecord(request.params[websiteRecordIdParam]);
         if (websiteRecord) {
             response.status(StatusCodes.OK);
@@ -82,7 +79,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         }
 
         const websiteRecord: WebsiteRecord = validationResult.data;
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         const updateSuccessful = await websiteRecordController.updateWebsiteRecord(request.params[websiteRecordIdParam], websiteRecord);
         if (updateSuccessful) {
             response.json(websiteRecord);
@@ -95,7 +91,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
 
     app.delete(websiteRecordPath, async (request, response) => {
         const websiteRecordId: string = request.params[websiteRecordIdParam];
-        const websiteRecordController = createWebsiteRecordController(mongoClient);
         if (await websiteRecordController.deleteWebsiteRecord(websiteRecordId)) {
             response.status(StatusCodes.NO_CONTENT);
         } else {

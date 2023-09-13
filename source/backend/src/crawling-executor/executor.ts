@@ -68,7 +68,7 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
         }
         const recordsCollection = getWebsiteRecordsCollection(mongoClient);
         if (execution.status === 'finished') {
-            const crawledSites = await redis.zrange(executionId, '-inf', '+inf');
+            const crawledSites = await redis.zrange(executionId, 0, -1);
             const crawledWebsitesCollection = getCrawledWebsitesCollection(mongoClient);
             const session = mongoClient.startSession();
             try {
@@ -85,24 +85,26 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
                 );
 
                 const updateResult = await recordsCollection.updateOne(
-                    { _id: new ObjectId(websiteRecord.id) },
+                    { _id: new ObjectId(websiteRecord.id), 'executions.id': executionId },
                     {
                         $set: {
-                            'executions.$[element]': {
-                                id: new ObjectId(executionId),
+                            'executions.$': {
+                                id: executionId,
                                 ...execution,
                             },
                         },
-                    },
-                    { arrayFilters: [{ element: { id: new ObjectId(executionId) } }] }
+                    }
                 );
 
                 if (updateResult.matchedCount > 0 && insertResult.insertedCount == crawledSites.length) {
+                    console.log('successful save');
+                    console.log(updateResult, insertResult);
                     await session.commitTransaction();
                 } else {
                     await session.abortTransaction();
                 }
             } catch (error) {
+                console.log(error);
                 await session.abortTransaction();
             } finally {
                 await session.endSession();

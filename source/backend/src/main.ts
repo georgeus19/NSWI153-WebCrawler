@@ -21,6 +21,8 @@ const executor = createCrawlingExecutor(mongoClient, { port: 6379, host: '127.0.
 addWebsiteRecordsApi(app, mongoClient, executor);
 addCrawlExecutionsApi(app, mongoClient, executor);
 
+executor.start();
+
 app.listen(3000, () => {
     console.log('App listening on port 3000');
 });

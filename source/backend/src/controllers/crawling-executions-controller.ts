@@ -1,27 +1,23 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { getWebsiteRecordsCollection } from './../db-access';
-import { FinishedCrawlingExecution, RunningCrawlingExecution } from '../crawling-executor/crawling-execution';
+import { FinishedCrawlingExecution, RunningCrawlingExecution, createNewRunningExecution } from '../crawling-executor/crawling-execution';
 
 export function createExecutionController(mongoClient: MongoClient) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);
 
     async function addExecution(websiteRecordId: string): Promise<string | undefined> {
-        const executionId = new ObjectId();
+        const execution = createNewRunningExecution(new ObjectId().toHexString());
         const updateResult = await recordsCollection.updateOne(
             { _id: new ObjectId(websiteRecordId) },
             {
                 $push: {
-                    executions: {
-                        id: executionId,
-                        status: 'running',
-                        startTime: Date.now(),
-                    },
+                    executions: execution,
                 },
             }
         );
 
         if (updateResult.matchedCount > 0) {
-            return executionId.toHexString();
+            return execution.id;
         } else {
             return undefined;
         }

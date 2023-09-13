@@ -1,20 +1,32 @@
+import { IdEntity } from '../base-types';
+
+export type FinishedCrawlingExecutionStatus = 'finished' | 'failed' | 'cancelled';
+export type RunningCrawlingExecutionStatus = 'running';
+export type CrawlingExecutionStatus = FinishedCrawlingExecutionStatus | RunningCrawlingExecutionStatus;
+
 export interface FinishedCrawlingExecution {
     start: Date;
     end: Date;
     sitesCrawled: number;
-    status: 'finished' | 'failed' | 'cancelled';
+    status: FinishedCrawlingExecutionStatus;
 }
 
 export interface RunningCrawlingExecution {
-    status: 'running';
+    status: RunningCrawlingExecutionStatus;
     start: Date;
 }
-
-export type CrawlingExecutionStatus = 'finished' | 'failed' | 'running' | 'cancelled';
 
 export interface CrawlRecord {
     url: string;
     crawlTime: Date;
     title: string;
     links: string[];
+}
+
+export function createNewRunningExecution(executionId: string): RunningCrawlingExecution & IdEntity {
+    return {
+        id: executionId,
+        status: 'running',
+        start: new Date(Date.now()),
+    };
 }

@@ -1,3 +1,4 @@
+import { IdEntity } from './base-types';
 import { FinishedCrawlingExecution, RunningCrawlingExecution } from './crawling-executor/crawling-execution';
 
 export interface WebsiteRecord {
@@ -11,7 +12,7 @@ export interface WebsiteRecord {
 }
 
 export interface HasExecutions {
-    executions: (FinishedCrawlingExecution | RunningCrawlingExecution)[];
+    executions: ((FinishedCrawlingExecution | RunningCrawlingExecution) & IdEntity)[];
 }
 
 export interface StoredWebsiteRecord extends WebsiteRecord, HasExecutions {}

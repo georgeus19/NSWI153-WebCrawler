@@ -35,14 +35,14 @@ async function runCrawlingExecution(workerInput: WorkerInput): Promise<FinishedC
     };
 
     // crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
-    const finished = await crawl(url, new RegExp(boundaryRegexp), saveCrawlRecord, cancel);
+    const status = await crawl(url, new RegExp(boundaryRegexp), saveCrawlRecord, cancel);
     const endTime = new Date(Date.now());
     redis.disconnect();
     return {
         start: startTime,
         end: endTime,
         sitesCrawled: count,
-        status: finished ? 'finished' : 'failed',
+        status: status,
     };
 }
 
