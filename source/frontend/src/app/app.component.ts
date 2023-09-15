@@ -10,12 +10,11 @@ export class AppComponent implements OnInit {
     x = { nothing: true };
 
     ngOnInit(): void {
-        fetch('/website-records')
-            .then((r) => r.json())
-            .then((data) => {
-                this.x = data;
-
-                console.log(this.x);
-            });
+        // fetch('/website-records')
+        //     .then((r) => r.json())
+        //     .then((data) => {
+        //         this.x = data;
+        //         console.log(this.x);
+        //     });
     }
 }

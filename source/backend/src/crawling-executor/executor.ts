@@ -92,6 +92,10 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
                                 id: executionId,
                                 ...execution,
                             },
+                            lastExecution: {
+                                id: executionId,
+                                ...execution,
+                            },
                         },
                     }
                 );

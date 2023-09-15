@@ -4,7 +4,7 @@ import { getWebsiteRecordsCollection } from '../db-access';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { createWebsiteRecordController } from '../controllers/website-records-controller';
-import { WebsiteRecord } from '../website-record';
+import { PaginationParams, WebsiteRecord, WebsiteRecordFilterParams, WebsiteRecordSortParams } from '../website-record';
 import { CrawlingExecutor } from '../crawling-executor/executor';
 
 export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
@@ -21,9 +21,53 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         tags: z.array(z.string()),
         // executions: z.array(crawlExecutionSchema).optional(),
     });
+
+    // const websiteRecordParamsSchema = z.object({
+    //     pagination: z.object({ skip: z.number(), limit: z.number() }).optional(),
+    //     sort: z.object({ lastExecutionFirst: z.boolean().optional(), urlAscending: z.boolean().optional() }).optional(),
+    //     filter: z.object({ url: z.string().optional(), label: z.string().optional(), tags: z.array(z.string()).optional() }).optional(),
+    // });
+
+    const websiteRecordParamsSchema = z
+        .object({
+            skip: z.coerce.number().nonnegative().optional(), // z.preprocess(s => parseInt(z.string().parse(s), 10)) z.string().regex(/^d+$/).transform(Number).optional(),
+            limit: z.coerce.number().positive().optional(),
+            lastExecutionFirst: z.boolean().optional(),
+            urlAscending: z.boolean().optional(),
+            url: z.string().optional(),
+            label: z.string().optional(),
+            tags: z.array(z.string()).optional(),
+        })
+        .refine((schema) => (schema.skip && schema.limit) || (!schema.skip && !schema.limit))
+        .refine(
+            (schema) =>
+                (schema.lastExecutionFirst && !schema.urlAscending) ||
+                (!schema.lastExecutionFirst && schema.urlAscending) ||
+                (!schema.lastExecutionFirst && !schema.urlAscending)
+        );
+
     const websiteRecordController = createWebsiteRecordController(mongoClient, crawlingExecutor);
     app.get(websiteRecordsPath, async (request, response) => {
-        const records = await websiteRecordController.getWebsiteRecords();
+        console.log(request.query);
+        const validationResult = websiteRecordParamsSchema.safeParse(request.query);
+        if (!validationResult.success) {
+            console.log(validationResult.error);
+            response.status(StatusCodes.BAD_REQUEST);
+            response.json(validationResult.error);
+            return;
+        }
+        const pagination: PaginationParams | undefined = validationResult.data.skip
+            ? { skip: validationResult.data.skip, limit: validationResult.data.limit! }
+            : undefined;
+        const filter: WebsiteRecordFilterParams | undefined =
+            validationResult.data.url || validationResult.data.label || (validationResult.data.tags && validationResult.data.tags.length > 0)
+                ? { url: validationResult.data.url, label: validationResult.data.label, tags: validationResult.data.tags }
+                : undefined;
+        const sort: WebsiteRecordSortParams | undefined =
+            validationResult.data.lastExecutionFirst || validationResult.data.urlAscending
+                ? { lastExecutionFirst: validationResult.data.lastExecutionFirst, urlAscending: validationResult.data.urlAscending }
+                : undefined;
+        const records = await websiteRecordController.getWebsiteRecords({ pagination: pagination, filter: filter, sort: sort });
 
         response.json(records);
         response.status(StatusCodes.OK);

@@ -1,0 +1,44 @@
+<!-- <p>website-records-page works!</p> -->
+<mat-radio-group> </mat-radio-group>
+<div class="website-records">
+    <mat-card class="card" *ngFor="let websiteRecord of websiteRecords">
+        <mat-card-header>
+            <mat-card-title>{{ websiteRecord.label }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <h3>Periodicity: {{ websiteRecord.periodicity }}</h3>
+            <h3>Status: {{ websiteRecord.active ? 'Active' : 'Inactive' }}</h3>
+            <mat-divider></mat-divider>
+            <h3>Last Execution:</h3>
+            <div class="last-execution" *ngIf="websiteRecord.lastExecution">
+                <div>Start: {{ websiteRecord.lastExecution.start }}</div>
+                <div *ngIf="websiteRecord.lastExecution.status !== 'running'"></div>
+                <div>End: {{ websiteRecord.lastExecution.status !== 'running' ? websiteRecord.lastExecution.end : 'Not finished yet.' }}</div>
+                <div>Status: {{ websiteRecord.lastExecution.status }}</div>
+            </div>
+            <div class="last-execution" *ngIf="!websiteRecord.lastExecution">
+                <div>No execution ran.</div>
+            </div>
+            <mat-divider></mat-divider>
+            <h3>Tags:</h3>
+            <div class="tags">
+                <div class="tag" *ngFor="let tag of websiteRecord.tags; let last = last">
+                    <span>'{{ tag }}'</span>
+                    <span *ngIf="!last">, &nbsp;</span>
+                </div>
+            </div>
+            <!-- <mat-card>
+                <mat-card-header>
+                </mat-card-header>
+                <mat-card-content>
+                </mat-card-content>
+            </mat-card> -->
+            <mat-card-actions>
+                <button class="action" mat-raised-button color="primary">Edit</button>
+                <button class="action" mat-raised-button color="primary">Delete</button>
+                <button class="action" mat-raised-button color="primary">Crawl</button>
+            </mat-card-actions>
+        </mat-card-content>
+        <!-- Label, Periodicity, Tags, time of last execution, the status of last execution -->
+    </mat-card>
+</div>

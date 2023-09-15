@@ -1,0 +1,53 @@
+.website-records {
+    padding-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    /* grid-auto-rows: 300px; */
+    gap: 20px;
+    /* background-color: aqua; */
+    margin-left: 50px;
+    margin-right: 50px;
+    /* display: flex;
+    flex-wrap: wrap;
+    flex-basis: 300px;
+    flex: 1 1 300px; */
+}
+.website-records .card {
+    flex-grow: 1;
+}
+
+.website-records li {
+    list-style-type: none;
+    background-color: #eee;
+}
+
+.action {
+    /* margin: auto; */
+
+    /* width: inherit; */
+    /* flex-grow: 1; */
+    flex: 1 0 0px;
+}
+
+mat-card-actions {
+    display: flex;
+    justify-items: flex-end;
+    align-items: end;
+    gap: 10px;
+    margin: auto;
+}
+
+.tags {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+h3 {
+    text-decoration: none;
+    margin: 0;
+}
+
+.last-execution {
+    height: 62px;
+}

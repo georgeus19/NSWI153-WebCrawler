@@ -1,6 +1,12 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { getWebsiteRecordsCollection } from '../db-access';
-import { WebsiteRecord, StoredWebsiteRecord } from '../website-record';
+import {
+    WebsiteRecord,
+    StoredWebsiteRecord,
+    WebsiteRecordFilterParams,
+    WebsiteRecordWithLastExecution,
+    WebsiteRecordParams,
+} from '../website-record';
 import { IdEntity } from '../base-types';
 import { createNewRunningExecution } from '../crawling-executor/crawling-execution';
 import { CrawlingExecutor } from '../crawling-executor/executor';
@@ -8,9 +14,27 @@ import { CrawlingExecutor } from '../crawling-executor/executor';
 export function createWebsiteRecordController(mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);
 
-    async function getWebsiteRecords(): Promise<WebsiteRecord & IdEntity[]> {
-        const records = await recordsCollection.find().project({ executions: 0 }).toArray();
-        return records as WebsiteRecord & IdEntity[];
+    async function getWebsiteRecords(params: WebsiteRecordParams): Promise<(WebsiteRecordWithLastExecution & IdEntity)[]> {
+        let querySpecification = recordsCollection.find();
+        if (params.filter) {
+            if (params.filter.label) {
+                querySpecification = querySpecification.filter({ label: params.filter.label });
+            }
+            if (params.filter.url) {
+                querySpecification = querySpecification.filter({ url: params.filter.url });
+            }
+            if (params.filter.tags) {
+                querySpecification = querySpecification.filter({ tags: { $all: params.filter.tags } });
+            }
+        }
+        console.log(params.pagination);
+        if (params.pagination) {
+            querySpecification = querySpecification.skip(params.pagination.skip).limit(params.pagination.limit);
+        }
+
+        const records = await querySpecification.project({ executions: 0 }).toArray();
+        // const records = await .sort({}).skip(params.pagination.skip).limit(params.pagination.limit)..toArray();
+        return records as unknown as (WebsiteRecordWithLastExecution & IdEntity)[];
     }
 
     async function addWebsiteRecord(websiteRecord: WebsiteRecord): Promise<string | undefined> {
@@ -20,7 +44,7 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
         };
         const insertedDoc = await recordsCollection.insertOne(storageRecord as any);
         const websiteRecordId = insertedDoc.acknowledged ? insertedDoc.insertedId.toHexString() : undefined;
-        if (websiteRecordId) {
+        if (websiteRecordId && websiteRecord.active) {
             crawlingExecutor.addExecution(websiteRecordId, storageRecord.executions[0].id);
         }
         return websiteRecordId;
@@ -31,9 +55,9 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
         return result.acknowledged;
     }
 
-    async function getWebsiteRecord(websiteRecordId: string): Promise<WebsiteRecord | null> {
+    async function getWebsiteRecord(websiteRecordId: string): Promise<WebsiteRecordWithLastExecution | null> {
         const websiteRecord = await recordsCollection.findOne({ _id: new ObjectId(websiteRecordId) }, { projection: { executions: 0 } });
-        return websiteRecord as WebsiteRecord | null;
+        return websiteRecord as WebsiteRecordWithLastExecution | null;
     }
 
     async function updateWebsiteRecord(websiteRecordId: string, websiteRecord: WebsiteRecord): Promise<boolean> {
