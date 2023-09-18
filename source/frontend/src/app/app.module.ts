@@ -12,9 +12,17 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { WebsiteRecordsPageFilterDialogComponent } from './website-records-page-filter-dialog/website-records-page-filter-dialog.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { WebsiteRecordsPageSortDialogComponent } from './website-records-page-sort-dialog/website-records-page-sort-dialog.component';
 
 @NgModule({
-    declarations: [AppComponent, WebsiteRecordsPageComponent, HeaderComponent],
+    declarations: [AppComponent, WebsiteRecordsPageComponent, HeaderComponent, WebsiteRecordsPageFilterDialogComponent, WebsiteRecordsPageSortDialogComponent],
     imports: [
         BrowserModule,
         AppRoutingModule,
@@ -25,6 +33,13 @@ import { MatRadioModule } from '@angular/material/radio';
         MatButtonModule,
         MatCardModule,
         MatRadioModule,
+        MatPaginatorModule,
+        MatSelectModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatInputModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

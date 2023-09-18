@@ -51,3 +51,10 @@ h3 {
 .last-execution {
     height: 62px;
 }
+
+.paginator {
+    /* margin: auto; */
+    /* background-color: aqua; */
+    display: flex;
+    justify-content: center;
+}

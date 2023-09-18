@@ -1,4 +1,4 @@
-import { IdEntity } from './base-types';
+import { IdEntity, Pagination } from './base-types';
 import { FinishedCrawlingExecution, RunningCrawlingExecution } from './crawling-executor/crawling-execution';
 
 export interface WebsiteRecord {
@@ -42,4 +42,9 @@ export interface WebsiteRecordParams {
     pagination?: PaginationParams;
     sort?: WebsiteRecordSortParams;
     filter?: WebsiteRecordFilterParams;
+}
+
+export interface PagedResults<T> {
+    data: T;
+    pagination: Pagination;
 }

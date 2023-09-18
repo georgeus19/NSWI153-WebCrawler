@@ -6,6 +6,7 @@ import {
     WebsiteRecordFilterParams,
     WebsiteRecordWithLastExecution,
     WebsiteRecordParams,
+    PagedResults,
 } from '../website-record';
 import { IdEntity } from '../base-types';
 import { createNewRunningExecution } from '../crawling-executor/crawling-execution';
@@ -14,19 +15,22 @@ import { CrawlingExecutor } from '../crawling-executor/executor';
 export function createWebsiteRecordController(mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);
 
-    async function getWebsiteRecords(params: WebsiteRecordParams): Promise<(WebsiteRecordWithLastExecution & IdEntity)[]> {
-        let querySpecification = recordsCollection.find();
+    async function getWebsiteRecords(params: WebsiteRecordParams): Promise<PagedResults<(WebsiteRecordWithLastExecution & IdEntity)[]>> {
+        const filter: Record<string, any> = {};
         if (params.filter) {
             if (params.filter.label) {
-                querySpecification = querySpecification.filter({ label: params.filter.label });
+                filter.label = { $regex: params.filter.label, $options: 'i' };
             }
             if (params.filter.url) {
-                querySpecification = querySpecification.filter({ url: params.filter.url });
+                filter.url = { $regex: params.filter.url, $options: 'i' };
             }
             if (params.filter.tags) {
-                querySpecification = querySpecification.filter({ tags: { $all: params.filter.tags } });
+                filter.tags = { $all: params.filter.tags };
             }
         }
+        const recordCount = await recordsCollection.countDocuments(filter);
+        let querySpecification = recordsCollection.find(filter);
+        console.log(recordCount);
         console.log(params.pagination);
         if (params.pagination) {
             querySpecification = querySpecification.skip(params.pagination.skip).limit(params.pagination.limit);
@@ -34,7 +38,7 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
 
         const records = await querySpecification.project({ executions: 0 }).toArray();
         // const records = await .sort({}).skip(params.pagination.skip).limit(params.pagination.limit)..toArray();
-        return records as unknown as (WebsiteRecordWithLastExecution & IdEntity)[];
+        return { data: records as unknown as (WebsiteRecordWithLastExecution & IdEntity)[], pagination: { length: recordCount } };
     }
 
     async function addWebsiteRecord(websiteRecord: WebsiteRecord): Promise<string | undefined> {

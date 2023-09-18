@@ -1,5 +1,12 @@
 <!-- <p>website-records-page works!</p> -->
 <mat-radio-group> </mat-radio-group>
+
+<div class="top-menu">
+    <button mat-stroked-button color="primary">Add</button>
+    <button mat-stroked-button color="primary" (click)="openSortDialog()">Sort</button>
+    <button mat-stroked-button color="primary" (click)="openFilterDialog()">Filter</button>
+    <!-- <button>Sort</button> -->
+</div>
 <div class="website-records">
     <mat-card class="card" *ngFor="let websiteRecord of websiteRecords">
         <mat-card-header>
@@ -42,3 +49,14 @@
         <!-- Label, Periodicity, Tags, time of last execution, the status of last execution -->
     </mat-card>
 </div>
+<mat-paginator
+    #paginator
+    class="paginator"
+    (page)="handlePageEvent($event)"
+    [length]="pagination.length"
+    [pageSize]="this.pageSize"
+    [disabled]="false"
+    [pageIndex]="this.pageIndex"
+    aria-label="Select page"
+>
+</mat-paginator>

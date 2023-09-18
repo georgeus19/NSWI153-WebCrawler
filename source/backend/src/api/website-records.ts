@@ -38,7 +38,11 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             label: z.string().optional(),
             tags: z.array(z.string()).optional(),
         })
-        .refine((schema) => (schema.skip && schema.limit) || (!schema.skip && !schema.limit))
+        .refine(
+            (schema) =>
+                (Object.hasOwn(schema, 'skip') && Object.hasOwn(schema, 'limit')) ||
+                (!Object.hasOwn(schema, 'skip') && !Object.hasOwn(schema, 'limit'))
+        )
         .refine(
             (schema) =>
                 (schema.lastExecutionFirst && !schema.urlAscending) ||
@@ -56,8 +60,8 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             response.json(validationResult.error);
             return;
         }
-        const pagination: PaginationParams | undefined = validationResult.data.skip
-            ? { skip: validationResult.data.skip, limit: validationResult.data.limit! }
+        const pagination: PaginationParams | undefined = Object.hasOwn(validationResult.data, 'skip')
+            ? { skip: validationResult.data.skip!, limit: validationResult.data.limit! }
             : undefined;
         const filter: WebsiteRecordFilterParams | undefined =
             validationResult.data.url || validationResult.data.label || (validationResult.data.tags && validationResult.data.tags.length > 0)
@@ -67,9 +71,12 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             validationResult.data.lastExecutionFirst || validationResult.data.urlAscending
                 ? { lastExecutionFirst: validationResult.data.lastExecutionFirst, urlAscending: validationResult.data.urlAscending }
                 : undefined;
-        const records = await websiteRecordController.getWebsiteRecords({ pagination: pagination, filter: filter, sort: sort });
-
-        response.json(records);
+        console.log(filter);
+        const recordsResult = await websiteRecordController.getWebsiteRecords({ pagination: pagination, filter: filter, sort: sort });
+        response.json({
+            data: recordsResult.data,
+            pagination: recordsResult.pagination,
+        });
         response.status(StatusCodes.OK);
     });
 

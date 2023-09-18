@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { WebsiteRecord, WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
-import { Observable } from 'rxjs';
+import { PagedResults, WebsiteRecord, WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
+import { Observable, distinct, map, mergeAll, tap } from 'rxjs';
 import { IdEntity } from '@backend/base-types';
+import { stringify, parse } from 'qs';
 
 @Injectable({
     providedIn: 'root',
@@ -15,18 +16,19 @@ export class WebsiteRecordsService {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
 
-    getWebsiteRecords(params: WebsiteRecordParams): Observable<(WebsiteRecordWithLastExecution & IdEntity)[]> {
-        const inOne: Record<string, string> = {};
-        const xx = { ...params.pagination, ...params.filter, ...params.sort };
-        Object.getOwnPropertyNames(xx)
-            // .filter((p) => p)
-            .map((p) => {
-                {
-                    inOne[p] = xx[p as keyof typeof xx]!.toString();
-                }
-            });
-        console.log(inOne);
-        return this.http.get<(WebsiteRecordWithLastExecution & IdEntity)[]>(`${this.websiteRecordsUrl}?${new URLSearchParams(inOne).toString()}`);
+    getWebsiteRecords(params: WebsiteRecordParams): Observable<PagedResults<(WebsiteRecordWithLastExecution & IdEntity)[]>> {
+        const flattenedParams = { ...params.pagination, ...params.filter, ...params.sort };
+        return this.http.get<PagedResults<(WebsiteRecordWithLastExecution & IdEntity)[]>>(`${this.websiteRecordsUrl}?${stringify(flattenedParams)}`);
+    }
+
+    getWebsiteRecordTags(): Observable<Set<string>> {
+        return this.getWebsiteRecords({}).pipe(
+            map((results) => {
+                const records = results.data;
+                const tags = records.flatMap((record) => record.tags);
+                return new Set(tags);
+            })
+        );
     }
 
     deleteWebsiteRecords(): Observable<unknown> {
