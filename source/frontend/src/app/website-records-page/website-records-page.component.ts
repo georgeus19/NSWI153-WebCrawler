@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WebsiteRecordsService } from '../website-records.service';
-import { WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
+import { SortParams, WebsiteRecord, WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
 import { IdEntity, Pagination } from '@backend/base-types';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,7 +8,8 @@ import {
     FilterData,
     WebsiteRecordsPageFilterDialogComponent,
 } from '../website-records-page-filter-dialog/website-records-page-filter-dialog.component';
-import { WebsiteRecordsPageSortDialogComponent } from '../website-records-page-sort-dialog/website-records-page-sort-dialog.component';
+import { SortData, WebsiteRecordsPageSortDialogComponent } from '../website-records-page-sort-dialog/website-records-page-sort-dialog.component';
+import { WebsiteRecordChangeResult, WebsiteRecordEditComponent, WebsiteRecordEditInput } from '../website-record-edit/website-record-edit.component';
 
 @Component({
     selector: 'app-website-records-page',
@@ -21,6 +22,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
     pageSize = 12;
     pageIndex = 0;
     filterData: FilterData = { tags: [], allTags: new Set<string>() };
+    sortData: SortData = { sortBy: 'lastExecution', asc: 'desc' };
     constructor(private websiteRecordsService: WebsiteRecordsService, public dialog: MatDialog) {}
     ngOnInit(): void {
         this.refresh();
@@ -30,6 +32,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
         this.pageSize = 12;
         this.pageIndex = 0;
         this.filterData = { tags: [], allTags: new Set<string>() };
+        this.sortData = { sortBy: 'lastExecution', asc: 'desc' };
         this.getWebsiteRecords();
         this.websiteRecordsService.getWebsiteRecordTags().subscribe((tags) => {
             this.filterData.allTags = tags;
@@ -56,7 +59,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
             tags: this.filterData.tags.length > 0 ? this.filterData.tags : undefined,
         };
 
-        this.websiteRecordsService.getWebsiteRecords({ pagination: pagination, filter: filter }).subscribe((websiteRecords) => {
+        this.websiteRecordsService.getWebsiteRecords({ pagination: pagination, filter: filter, sort: this.sortData }).subscribe((websiteRecords) => {
             console.log(websiteRecords);
             this.websiteRecords = websiteRecords.data;
             console.log(this.websiteRecords);
@@ -81,13 +84,15 @@ export class WebsiteRecordsPageComponent implements OnInit {
 
     openSortDialog(): void {
         const sortDialogRef = this.dialog.open(WebsiteRecordsPageSortDialogComponent, {
-            data: 'testicek',
+            data: this.sortData,
         });
         sortDialogRef.afterClosed().subscribe((resultSortData) => {
-            // if (resultFilterData) {
-            //     this.filterData = resultFilterData;
-            //     this.getWebsiteRecords();
-            // }
+            if (resultSortData) {
+                this.sortData = resultSortData;
+                this.pageSize = 12;
+                this.pageIndex = 0;
+                this.getWebsiteRecords();
+            }
         });
     }
 
@@ -101,5 +106,27 @@ export class WebsiteRecordsPageComponent implements OnInit {
 
     onTagsUpdate(tags: Set<string>): void {
         this.filterData.allTags = tags;
+    }
+
+    addWebsiteRecord(): void {
+        const emptyRecord: WebsiteRecord = {
+            label: '',
+            active: true,
+            boundaryRegExp: '^http.*',
+            periodicity: 0,
+            url: '',
+            tags: [],
+        };
+        const editInput: WebsiteRecordEditInput = { websiteRecord: emptyRecord, allTags: this.filterData.allTags, actionName: 'Add' };
+        const editDialogRef = this.dialog.open(WebsiteRecordEditComponent, {
+            data: editInput,
+        });
+        editDialogRef.afterClosed().subscribe((editResult: WebsiteRecordChangeResult) => {
+            if (editResult) {
+                this.websiteRecordsService.addWebsiteRecord(editResult.updatedWebsiteRecord).subscribe((newRecordId) => {
+                    this.getWebsiteRecords();
+                });
+            }
+        });
     }
 }

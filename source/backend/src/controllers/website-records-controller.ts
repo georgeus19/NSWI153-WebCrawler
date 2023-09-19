@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient, ObjectId, Sort, SortDirection } from 'mongodb';
 import { getWebsiteRecordsCollection } from '../db-access';
 import {
     WebsiteRecord,
@@ -32,6 +32,10 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
         let querySpecification = recordsCollection.find(filter);
         console.log(recordCount);
         console.log(params.pagination);
+        console.log('params.sort', params.sort);
+        if (params.sort && params.sort.sortBy) {
+            querySpecification = querySpecification.sort(params.sort.sortBy, params.sort.asc);
+        }
         if (params.pagination) {
             querySpecification = querySpecification.skip(params.pagination.skip).limit(params.pagination.limit);
         }

@@ -4,7 +4,7 @@ import { getWebsiteRecordsCollection } from '../db-access';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { z } from 'zod';
 import { createWebsiteRecordController } from '../controllers/website-records-controller';
-import { PaginationParams, WebsiteRecord, WebsiteRecordFilterParams, WebsiteRecordSortParams } from '../website-record';
+import { PaginationParams, WebsiteRecord, WebsiteRecordFilterParams, SortParams, WebsiteRecordSortOption, AscOrDesc } from '../website-record';
 import { CrawlingExecutor } from '../crawling-executor/executor';
 
 export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
@@ -15,7 +15,7 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         // id: z.string().optional(),
         url: z.string().url(),
         boundaryRegExp: z.string(),
-        periodicity: z.number(),
+        periodicity: z.coerce.number().positive(),
         label: z.string(),
         active: z.boolean(),
         tags: z.array(z.string()),
@@ -32,8 +32,8 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         .object({
             skip: z.coerce.number().nonnegative().optional(), // z.preprocess(s => parseInt(z.string().parse(s), 10)) z.string().regex(/^d+$/).transform(Number).optional(),
             limit: z.coerce.number().positive().optional(),
-            lastExecutionFirst: z.boolean().optional(),
-            urlAscending: z.boolean().optional(),
+            sortBy: z.string().regex(new RegExp('^(url)|(lastExecution)$')).optional(),
+            asc: z.string().regex(new RegExp('^(asc)|(desc)$')).optional(),
             url: z.string().optional(),
             label: z.string().optional(),
             tags: z.array(z.string()).optional(),
@@ -42,12 +42,6 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             (schema) =>
                 (Object.hasOwn(schema, 'skip') && Object.hasOwn(schema, 'limit')) ||
                 (!Object.hasOwn(schema, 'skip') && !Object.hasOwn(schema, 'limit'))
-        )
-        .refine(
-            (schema) =>
-                (schema.lastExecutionFirst && !schema.urlAscending) ||
-                (!schema.lastExecutionFirst && schema.urlAscending) ||
-                (!schema.lastExecutionFirst && !schema.urlAscending)
         );
 
     const websiteRecordController = createWebsiteRecordController(mongoClient, crawlingExecutor);
@@ -67,11 +61,14 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
             validationResult.data.url || validationResult.data.label || (validationResult.data.tags && validationResult.data.tags.length > 0)
                 ? { url: validationResult.data.url, label: validationResult.data.label, tags: validationResult.data.tags }
                 : undefined;
-        const sort: WebsiteRecordSortParams | undefined =
-            validationResult.data.lastExecutionFirst || validationResult.data.urlAscending
-                ? { lastExecutionFirst: validationResult.data.lastExecutionFirst, urlAscending: validationResult.data.urlAscending }
-                : undefined;
-        console.log(filter);
+        const sort: SortParams | undefined = validationResult.data.sortBy
+            ? {
+                  sortBy: validationResult.data.sortBy as WebsiteRecordSortOption,
+                  asc: (Object.hasOwn(validationResult.data, 'asc') ? validationResult.data.asc : 'asc') as AscOrDesc,
+              }
+            : undefined;
+        console.log(validationResult.data);
+        console.log(sort);
         const recordsResult = await websiteRecordController.getWebsiteRecords({ pagination: pagination, filter: filter, sort: sort });
         response.json({
             data: recordsResult.data,
@@ -84,6 +81,7 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         console.log(request.body);
         const validationResult = websiteRecordSchema.safeParse(request.body);
         if (!validationResult.success) {
+            console.log(validationResult.error);
             response.status(StatusCodes.BAD_REQUEST);
             response.json(validationResult.error);
             return;

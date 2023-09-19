@@ -1,7 +1,12 @@
 <div class="top-menu">
-    <button mat-stroked-button color="primary">Add</button>
-    <button mat-stroked-button color="primary" (click)="openSortDialog()">Sort</button>
-    <button mat-stroked-button color="primary" (click)="openFilterDialog()">Filter</button>
+    <div>
+        <button mat-stroked-button color="primary" (click)="addWebsiteRecord()">Add</button>
+        <button mat-stroked-button color="primary" (click)="refresh()">Refresh</button>
+    </div>
+    <div>
+        <button mat-stroked-button color="primary" (click)="openSortDialog()">Sort</button>
+        <button mat-stroked-button color="primary" (click)="openFilterDialog()">Filter</button>
+    </div>
 </div>
 <div class="website-records">
     <app-website-record-card

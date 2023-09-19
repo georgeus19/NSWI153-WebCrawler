@@ -19,3 +19,32 @@
     display: flex;
     justify-content: center;
 }
+
+.top-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+.top-menu > :nth-child(1) {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: start;
+    justify-self: start;
+}
+
+.top-menu > :nth-child(2) {
+    display: grid;
+    justify-self: end;
+    gap: 10px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: end;
+}
+
+.top-menu button {
+    padding: 20px;
+}

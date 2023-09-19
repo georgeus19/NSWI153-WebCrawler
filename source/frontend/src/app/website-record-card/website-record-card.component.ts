@@ -4,6 +4,7 @@ import { WebsiteRecord, WebsiteRecordWithLastExecution } from '@backend/website-
 import { WebsiteRecordsService } from '../website-records.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WebsiteRecordChangeResult, WebsiteRecordEditComponent, WebsiteRecordEditInput } from '../website-record-edit/website-record-edit.component';
+import { fromNumber, toNumber } from '../periodicity';
 
 @Component({
     selector: 'app-website-record-card',
@@ -16,18 +17,26 @@ export class WebsiteRecordCardComponent {
     @Output() deleteRecordEvent = new EventEmitter<string>();
     @Output() updatedRecordEvent = new EventEmitter<WebsiteRecordWithLastExecution & IdEntity>();
     @Output() updatedTagsEvent = new EventEmitter<Set<string>>();
+
     constructor(private websiteRecordService: WebsiteRecordsService, public dialog: MatDialog) {}
+
     onEdit(websiteRecord: WebsiteRecordWithLastExecution & IdEntity): void {
-        const editInput: WebsiteRecordEditInput = { websiteRecord: websiteRecord, allTags: this.allTags ? this.allTags : new Set<string>() };
+        const editInput: WebsiteRecordEditInput = {
+            websiteRecord: websiteRecord,
+            allTags: this.allTags ? this.allTags : new Set<string>(),
+            actionName: 'Edit',
+        };
         const editDialogRef = this.dialog.open(WebsiteRecordEditComponent, {
             data: editInput,
         });
-        editDialogRef.afterClosed().subscribe((editResult: WebsiteRecordChangeResult) => {
+        editDialogRef.afterClosed().subscribe((editResult) => {
             if (editResult) {
-                const record: any = { ...editResult.updatedWebsiteRecord };
+                const record: any = {
+                    ...editResult.updatedWebsiteRecord,
+                };
                 delete record.id;
                 this.websiteRecordService
-                    .updateWebsiteRecord(editResult.updatedWebsiteRecord.id, record)
+                    .updateWebsiteRecord(websiteRecord.id, record)
                     .subscribe((updatedRecord: WebsiteRecordWithLastExecution & IdEntity) => {
                         this.updatedRecordEvent.emit(updatedRecord);
                         this.updatedTagsEvent.emit(editResult.updatedTags);
@@ -44,4 +53,5 @@ export class WebsiteRecordCardComponent {
     onCrawl(): void {
         console.log('do crawling');
     }
+    fromNumber = fromNumber;
 }

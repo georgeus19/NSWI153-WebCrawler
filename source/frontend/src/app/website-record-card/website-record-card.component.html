@@ -6,7 +6,7 @@
         <h3 class="url">{{ websiteRecord.url }}</h3>
         <mat-divider></mat-divider>
         <h3>Boundary RegExp: {{ websiteRecord.boundaryRegExp }}</h3>
-        <h3>Periodicity: {{ websiteRecord.periodicity }}</h3>
+        <h3>Periodicity: {{ fromNumber(websiteRecord.periodicity) }}</h3>
         <h3>Status: {{ websiteRecord.active ? 'Active' : 'Inactive' }}</h3>
         <mat-divider></mat-divider>
         <h3>Last Execution:</h3>
@@ -14,7 +14,7 @@
             <div>Start: {{ websiteRecord.lastExecution.start }}</div>
             <div *ngIf="websiteRecord.lastExecution.status !== 'running'"></div>
             <div>End: {{ websiteRecord.lastExecution.status !== 'running' ? websiteRecord.lastExecution.end : 'Not finished yet.' }}</div>
-            <div>Status: {{ websiteRecord.lastExecution.status }}</div>
+            <div>Status: {{ websiteRecord.lastExecution.status | uppercase }}</div>
         </div>
         <div class="last-execution" *ngIf="!websiteRecord.lastExecution">
             <div>No execution ran.</div>

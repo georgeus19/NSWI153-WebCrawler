@@ -1,14 +1,14 @@
-<h1 mat-dialog-title>Filter Website Records</h1>
+<h1 mat-dialog-title>Sort Website Records By</h1>
 
 <div mat-dialog-content>
-    <mat-form-field>
-        <mat-label>URL</mat-label>
-        <input matInput type="text" [(ngModel)]="filterDataInput" />
-    </mat-form-field>
-    <mat-form-field>
-        <mat-label>Label</mat-label>
-        <input matInput type="text" [(ngModel)]="filterDataInput" />
-    </mat-form-field>
+    <mat-radio-group aria-label="Select an option" [(ngModel)]="sortData.sortBy">
+        <mat-radio-button value="url">By URL</mat-radio-button>
+        <mat-radio-button value="lastExecution">By Last Execution</mat-radio-button>
+    </mat-radio-group>
+    <mat-radio-group aria-label="Select an option" [(ngModel)]="sortData.asc">
+        <mat-radio-button value="asc">ASC</mat-radio-button>
+        <mat-radio-button value="desc">DESC</mat-radio-button>
+    </mat-radio-group>
 </div>
 <div mat-dialog-actions>
     <button mat-button (click)="onNoClick()">Close</button>

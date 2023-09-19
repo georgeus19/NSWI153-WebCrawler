@@ -27,9 +27,12 @@ export interface PaginationParams {
     limit: number;
 }
 
-export interface WebsiteRecordSortParams {
-    lastExecutionFirst?: boolean;
-    urlAscending?: boolean;
+export type WebsiteRecordSortOption = 'url' | 'lastExecution';
+export type AscOrDesc = 'asc' | 'desc';
+
+export interface SortParams {
+    sortBy?: WebsiteRecordSortOption;
+    asc?: AscOrDesc;
 }
 
 export interface WebsiteRecordFilterParams {
@@ -40,7 +43,7 @@ export interface WebsiteRecordFilterParams {
 
 export interface WebsiteRecordParams {
     pagination?: PaginationParams;
-    sort?: WebsiteRecordSortParams;
+    sort?: SortParams;
     filter?: WebsiteRecordFilterParams;
 }
 
