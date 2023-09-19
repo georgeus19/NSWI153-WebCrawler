@@ -104,6 +104,7 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
     app.delete(websiteRecordsPath, async (request, response) => {
         if (await websiteRecordController.deleteAllWebsiteRecords()) {
             response.status(StatusCodes.NO_CONTENT);
+            response.send(ReasonPhrases.NO_CONTENT);
         } else {
             response.status(StatusCodes.BAD_REQUEST);
             response.send(ReasonPhrases.BAD_REQUEST);
@@ -130,9 +131,9 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         }
 
         const websiteRecord: WebsiteRecord = validationResult.data;
-        const updateSuccessful = await websiteRecordController.updateWebsiteRecord(request.params[websiteRecordIdParam], websiteRecord);
-        if (updateSuccessful) {
-            response.json(websiteRecord);
+        const updatedRecord = await websiteRecordController.updateWebsiteRecord(request.params[websiteRecordIdParam], websiteRecord);
+        if (updatedRecord) {
+            response.json(updatedRecord);
             response.status(StatusCodes.OK);
         } else {
             response.send(ReasonPhrases.BAD_REQUEST);
@@ -144,8 +145,10 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
         const websiteRecordId: string = request.params[websiteRecordIdParam];
         if (await websiteRecordController.deleteWebsiteRecord(websiteRecordId)) {
             response.status(StatusCodes.NO_CONTENT);
+            response.send(ReasonPhrases.NO_CONTENT);
         } else {
             response.status(StatusCodes.BAD_REQUEST);
+            response.send(ReasonPhrases.BAD_REQUEST);
         }
     });
 }

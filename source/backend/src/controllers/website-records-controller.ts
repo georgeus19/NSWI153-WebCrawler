@@ -36,7 +36,14 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
             querySpecification = querySpecification.skip(params.pagination.skip).limit(params.pagination.limit);
         }
 
-        const records = await querySpecification.project({ executions: 0 }).toArray();
+        const records = await querySpecification
+            .project({ executions: 0 })
+            .map((record) => {
+                record.id = record._id;
+                delete record._id;
+                return record;
+            })
+            .toArray();
         // const records = await .sort({}).skip(params.pagination.skip).limit(params.pagination.limit)..toArray();
         return { data: records as unknown as (WebsiteRecordWithLastExecution & IdEntity)[], pagination: { length: recordCount } };
     }
@@ -64,7 +71,10 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
         return websiteRecord as WebsiteRecordWithLastExecution | null;
     }
 
-    async function updateWebsiteRecord(websiteRecordId: string, websiteRecord: WebsiteRecord): Promise<boolean> {
+    async function updateWebsiteRecord(
+        websiteRecordId: string,
+        websiteRecord: WebsiteRecord
+    ): Promise<(WebsiteRecordWithLastExecution & IdEntity) | null> {
         const storedWebsiteRecord = (await recordsCollection.findOne({ _id: new ObjectId(websiteRecordId) })) as StoredWebsiteRecord | null;
         if (storedWebsiteRecord) {
             const differentUrl: boolean = storedWebsiteRecord.url !== websiteRecord.url;
@@ -78,16 +88,20 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
             if (runNewExecution) {
                 websiteRecordToAdd.executions.push(createNewRunningExecution(executionId));
             }
-            const updateResult = await recordsCollection.updateOne({ _id: new ObjectId(websiteRecordId) }, websiteRecord, { upsert: true });
+            const updateResult = await recordsCollection.updateOne({ _id: new ObjectId(websiteRecordId) }, { $set: websiteRecord }, { upsert: true });
             const updated = updateResult.matchedCount > 0;
 
             if (updated && runNewExecution) {
                 crawlingExecutor.addExecution(websiteRecordId, executionId);
             }
-            return updated;
+            const updatedRecord: any = websiteRecordToAdd;
+            delete updatedRecord.executions;
+            updatedRecord.id = websiteRecordId;
+
+            return updatedRecord;
         }
 
-        return false;
+        return null;
     }
 
     async function deleteWebsiteRecord(websiteRecordId: string): Promise<boolean> {
