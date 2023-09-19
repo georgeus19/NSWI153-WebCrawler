@@ -27,6 +27,9 @@ export class WebsiteRecordsPageComponent implements OnInit {
     }
 
     refresh(): void {
+        this.pageSize = 12;
+        this.pageIndex = 0;
+        this.filterData = { tags: [], allTags: new Set<string>() };
         this.getWebsiteRecords();
         this.websiteRecordsService.getWebsiteRecordTags().subscribe((tags) => {
             this.filterData.allTags = tags;
@@ -69,6 +72,8 @@ export class WebsiteRecordsPageComponent implements OnInit {
             if (resultFilterData) {
                 this.filterData = resultFilterData;
                 console.log('filterData', this.filterData);
+                this.pageSize = 12;
+                this.pageIndex = 0;
                 this.getWebsiteRecords();
             }
         });
@@ -76,7 +81,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
 
     openSortDialog(): void {
         const sortDialogRef = this.dialog.open(WebsiteRecordsPageSortDialogComponent, {
-            data: this.filterData,
+            data: 'testicek',
         });
         sortDialogRef.afterClosed().subscribe((resultSortData) => {
             // if (resultFilterData) {
@@ -84,5 +89,17 @@ export class WebsiteRecordsPageComponent implements OnInit {
             //     this.getWebsiteRecords();
             // }
         });
+    }
+
+    onRecordDelete(): void {
+        this.getWebsiteRecords();
+    }
+
+    onRecordUpdate(): void {
+        this.getWebsiteRecords();
+    }
+
+    onTagsUpdate(tags: Set<string>): void {
+        this.filterData.allTags = tags;
     }
 }

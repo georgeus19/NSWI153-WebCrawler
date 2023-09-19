@@ -20,9 +20,21 @@ import { WebsiteRecordsPageFilterDialogComponent } from './website-records-page-
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { WebsiteRecordsPageSortDialogComponent } from './website-records-page-sort-dialog/website-records-page-sort-dialog.component';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { WebsiteRecordCardComponent } from './website-record-card/website-record-card.component';
+import { WebsiteRecordEditComponent } from './website-record-edit/website-record-edit.component';
 
 @NgModule({
-    declarations: [AppComponent, WebsiteRecordsPageComponent, HeaderComponent, WebsiteRecordsPageFilterDialogComponent, WebsiteRecordsPageSortDialogComponent],
+    declarations: [
+        AppComponent,
+        WebsiteRecordsPageComponent,
+        HeaderComponent,
+        WebsiteRecordsPageFilterDialogComponent,
+        WebsiteRecordsPageSortDialogComponent,
+        WebsiteRecordCardComponent,
+        WebsiteRecordEditComponent,
+    ],
     imports: [
         BrowserModule,
         AppRoutingModule,
@@ -40,6 +52,8 @@ import { WebsiteRecordsPageSortDialogComponent } from './website-records-page-so
         FormsModule,
         ReactiveFormsModule,
         MatInputModule,
+        MatButtonToggleModule,
+        MatSlideToggleModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

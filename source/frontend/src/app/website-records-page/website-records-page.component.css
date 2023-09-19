@@ -12,45 +12,6 @@
     flex-basis: 300px;
     flex: 1 1 300px; */
 }
-.website-records .card {
-    flex-grow: 1;
-}
-
-.website-records li {
-    list-style-type: none;
-    background-color: #eee;
-}
-
-.action {
-    /* margin: auto; */
-
-    /* width: inherit; */
-    /* flex-grow: 1; */
-    flex: 1 0 0px;
-}
-
-mat-card-actions {
-    display: flex;
-    justify-items: flex-end;
-    align-items: end;
-    gap: 10px;
-    margin: auto;
-}
-
-.tags {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-h3 {
-    text-decoration: none;
-    margin: 0;
-}
-
-.last-execution {
-    height: 62px;
-}
 
 .paginator {
     /* margin: auto; */

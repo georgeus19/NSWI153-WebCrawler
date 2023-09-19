@@ -15,10 +15,15 @@ export interface FilterData {
     styleUrls: ['./website-records-page-filter-dialog.component.css'],
 })
 export class WebsiteRecordsPageFilterDialogComponent {
-    constructor(public dialogRef: MatDialogRef<WebsiteRecordsPageFilterDialogComponent>, @Inject(MAT_DIALOG_DATA) public filterData: FilterData) {
-        this.tags = new FormControl(filterData.tags);
-        console.log('tags', filterData.tags, this.tags);
+    constructor(
+        public dialogRef: MatDialogRef<WebsiteRecordsPageFilterDialogComponent>,
+        @Inject(MAT_DIALOG_DATA) public filterDataInput: FilterData
+    ) {
+        this.filterData = { ...filterDataInput };
+        this.tags = new FormControl(this.filterData.tags);
+        console.log('tags', this.filterData.tags, this.tags);
     }
+    filterData: FilterData = { tags: [], allTags: new Set<string>() };
     tags = new FormControl();
     onNoClick(): void {
         this.dialogRef.close();

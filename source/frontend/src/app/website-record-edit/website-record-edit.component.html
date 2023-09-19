@@ -1,0 +1,45 @@
+<h1 mat-dialog-title>Edit Website Record</h1>
+
+<div mat-dialog-content class="edit-grid">
+    <mat-form-field>
+        <mat-label>Label</mat-label>
+        <input matInput type="text" minlength="1" [(ngModel)]="websiteRecord.label" />
+        <div *ngIf="websiteRecord.label.length === 0">Label must be at least 1 character long.</div>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>URL</mat-label>
+        <input matInput type="text" [(ngModel)]="websiteRecord.url" />
+        <div *ngIf="websiteRecord.url.length === 0">URL must be at least 1 character long.</div>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Boundary RegExp</mat-label>
+        <input matInput type="text" [(ngModel)]="websiteRecord.boundaryRegExp" />
+        <div *ngIf="websiteRecord.boundaryRegExp.length === 0">Boundary Regexp must be at least 1 character long.</div>
+    </mat-form-field>
+    <mat-form-field floatLabel="always">
+        <mat-label>Status</mat-label>
+        <mat-slide-toggle matInput [(ngModel)]="websiteRecord.active"> {{ websiteRecord.active ? 'Active' : 'Inactive' }}</mat-slide-toggle>
+        <textarea matInput hidden></textarea>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Periodicity</mat-label>
+        <input matInput type="text" [(ngModel)]="websiteRecord.periodicity" />
+        <div *ngIf="websiteRecord.periodicity > 0">Periodicity must be at least 1 character long.</div>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Tags</mat-label>
+        <mat-select [formControl]="tags" multiple>
+            <mat-option *ngFor="let tag of allTags" [value]="tag">{{ tag }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+        <mat-label>Add Tag</mat-label>
+        <input matInput type="text" minlength="1" [(ngModel)]="toAddTag" #addTagInput="ngModel" />
+        <button mat-button (click)="addTag()">Add tag</button>
+        <div *ngIf="toAddTag.length == 0">Tag must be at least 1 character long.</div>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Close</button>
+    <button mat-button (click)="okClick()" cdkFocusInitial>Ok</button>
+</div>

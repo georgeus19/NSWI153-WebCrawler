@@ -43,7 +43,15 @@ export class WebsiteRecordsService {
         return this.http.post<IdEntity>(this.websiteRecordsUrl, websiteRecord, this.httpOptions);
     }
 
-    updateWebsiteRecord(websiteRecordId: string, websiteRecord: WebsiteRecord): Observable<WebsiteRecord> {
-        return this.http.put<WebsiteRecord>(`${this.websiteRecordsUrl}/${websiteRecordId}`, websiteRecord, this.httpOptions);
+    updateWebsiteRecord(websiteRecordId: string, websiteRecord: WebsiteRecord): Observable<WebsiteRecordWithLastExecution & IdEntity> {
+        return this.http.put<WebsiteRecordWithLastExecution & IdEntity>(
+            `${this.websiteRecordsUrl}/${websiteRecordId}`,
+            websiteRecord,
+            this.httpOptions
+        );
+    }
+
+    deleteWebsiteRecord(websiteRecordId: string): Observable<unknown> {
+        return this.http.delete(`${this.websiteRecordsUrl}/${websiteRecordId}`);
     }
 }
