@@ -1,6 +1,12 @@
 import { MongoClient, ObjectId } from 'mongodb';
 import { getWebsiteRecordsCollection } from './../db-access';
-import { FinishedCrawlingExecution, RunningCrawlingExecution, createNewRunningExecution } from '../crawling-executor/crawling-execution';
+import {
+    CrawlingExecutionWithWebsiteRecordId,
+    FinishedCrawlingExecution,
+    RunningCrawlingExecution,
+    createNewRunningExecution,
+} from '../crawling-executor/crawling-execution';
+import { IdEntity } from '../base-types';
 
 export function createExecutionController(mongoClient: MongoClient) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);
@@ -23,25 +29,26 @@ export function createExecutionController(mongoClient: MongoClient) {
         }
     }
 
-    async function getExecutions(websiteRecordId?: string): Promise<(FinishedCrawlingExecution | RunningCrawlingExecution)[]> {
+    async function getExecutions(websiteRecordId?: string): Promise<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]> {
         const pipeline = [];
         if (websiteRecordId) {
             pipeline.push({ $match: { _id: new ObjectId(websiteRecordId) } });
         }
-        pipeline.push({ $project: { _id: 0, executions: 1 } });
+        pipeline.push({ $project: { _id: 1, executions: 1 } });
         pipeline.push({ $unwind: '$executions' });
-        pipeline.push({ $replaceWith: '$executions' });
+        pipeline.push({ $replaceWith: { $mergeObjects: ['$$ROOT', '$executions'] } });
+        pipeline.push({ $project: { executions: 0 } });
         const executions = await recordsCollection
             .aggregate(pipeline)
             .map((doc) => {
-                doc.id = doc._id;
+                doc.websiteRecordId = doc._id;
                 return doc;
             })
             .toArray();
-        return executions as (FinishedCrawlingExecution | RunningCrawlingExecution)[];
+        return executions as (CrawlingExecutionWithWebsiteRecordId & IdEntity)[];
     }
 
-    async function getExecution(websiteRecordId: string, executionId: string): Promise<FinishedCrawlingExecution | RunningCrawlingExecution | null> {
+    async function getExecution(websiteRecordId: string, executionId: string): Promise<CrawlingExecutionWithWebsiteRecordId | null> {
         const execution = await recordsCollection
             .aggregate([
                 {
@@ -60,7 +67,7 @@ export function createExecutionController(mongoClient: MongoClient) {
                 { $match: { id: new ObjectId(executionId) } },
             ])
             .next();
-        return execution as FinishedCrawlingExecution | RunningCrawlingExecution | null;
+        return execution as CrawlingExecutionWithWebsiteRecordId | null;
     }
 
     return {

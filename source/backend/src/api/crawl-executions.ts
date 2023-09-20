@@ -16,7 +16,7 @@ export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoCl
         sitesCrawled: z.number(),
         status: z.string().regex(new RegExp('^(finished)|(failed)$')),
     });
-    app.get(crawlExecutionsPath, async (request, response) => {
+    app.get('/website-records-crawl-executions', async (request, response) => {
         const executionController = createExecutionController(mongoClient);
         const executions = await executionController.getExecutions();
         response.json(executions);

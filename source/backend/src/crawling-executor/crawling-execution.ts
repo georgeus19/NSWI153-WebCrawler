@@ -4,6 +4,8 @@ export type FinishedCrawlingExecutionStatus = 'finished' | 'failed' | 'cancelled
 export type RunningCrawlingExecutionStatus = 'running';
 export type CrawlingExecutionStatus = FinishedCrawlingExecutionStatus | RunningCrawlingExecutionStatus;
 
+export type CrawlingExecution = FinishedCrawlingExecution | RunningCrawlingExecution;
+
 export interface FinishedCrawlingExecution {
     start: Date;
     end: Date;
@@ -15,6 +17,8 @@ export interface RunningCrawlingExecution {
     status: RunningCrawlingExecutionStatus;
     start: Date;
 }
+
+export type CrawlingExecutionWithWebsiteRecordId = CrawlingExecution & { websiteRecordId: string };
 
 export interface CrawlRecord {
     url: string;

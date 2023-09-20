@@ -1,0 +1,11 @@
+<div *ngIf="websiteRecord">
+    <app-website-record-card
+        class="card"
+        [websiteRecord]="websiteRecord"
+        [allTags]="allTags"
+        (deleteRecordEvent)="onRecordDelete()"
+        (updatedRecordEvent)="onRecordUpdate()"
+        (updatedTagsEvent)="onTagsUpdate($event)"
+    ></app-website-record-card>
+    <app-executions-table [executions]="tableInput"></app-executions-table>
+</div>

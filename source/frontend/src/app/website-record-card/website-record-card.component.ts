@@ -5,6 +5,7 @@ import { WebsiteRecordsService } from '../website-records.service';
 import { MatDialog } from '@angular/material/dialog';
 import { WebsiteRecordChangeResult, WebsiteRecordEditComponent, WebsiteRecordEditInput } from '../website-record-edit/website-record-edit.component';
 import { fromNumber, toNumber } from '../periodicity';
+import { RoutePaths } from '../app-routing.module';
 
 @Component({
     selector: 'app-website-record-card',
@@ -54,4 +55,5 @@ export class WebsiteRecordCardComponent {
         console.log('do crawling');
     }
     fromNumber = fromNumber;
+    routePaths = RoutePaths;
 }

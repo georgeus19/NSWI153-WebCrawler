@@ -17,7 +17,11 @@ export class ExecutionsService {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
 
-    getExecutions(): Observable<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]> {
-        return this.http.get<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]>(`/api/website-records-crawl-executions`);
+    getExecutions(websiteRecordId?: string): Observable<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]> {
+        if (websiteRecordId) {
+            return this.http.get<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]>(`/api/website-records/${websiteRecordId}/crawl-executions`);
+        } else {
+            return this.http.get<(CrawlingExecutionWithWebsiteRecordId & IdEntity)[]>(`/api/website-records-crawl-executions`);
+        }
     }
 }

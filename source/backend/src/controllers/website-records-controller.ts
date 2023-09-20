@@ -71,7 +71,11 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
     }
 
     async function getWebsiteRecord(websiteRecordId: string): Promise<WebsiteRecordWithLastExecution | null> {
-        const websiteRecord = await recordsCollection.findOne({ _id: new ObjectId(websiteRecordId) }, { projection: { executions: 0 } });
+        const websiteRecord: any = await recordsCollection.findOne({ _id: new ObjectId(websiteRecordId) }, { projection: { executions: 0 } });
+        if (websiteRecord) {
+            websiteRecord.id = websiteRecord._id;
+            delete websiteRecord._id;
+        }
         return websiteRecord as WebsiteRecordWithLastExecution | null;
     }
 

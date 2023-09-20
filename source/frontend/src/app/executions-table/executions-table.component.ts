@@ -3,12 +3,12 @@ import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { IdEntity } from '@backend/base-types';
-import { CrawlingExecutionWithWebsiteRecordId } from '@backend/crawling-executor/crawling-execution';
-import { WebsiteRecordWithLastExecution } from '@backend/website-record';
+import { CrawlingExecution, CrawlingExecutionWithWebsiteRecordId } from '@backend/crawling-executor/crawling-execution';
+import { WebsiteRecord, WebsiteRecordWithLastExecution } from '@backend/website-record';
 
-interface ExecutionWithRecord {
-    execution: CrawlingExecutionWithWebsiteRecordId & IdEntity;
-    record: WebsiteRecordWithLastExecution & IdEntity;
+export interface ExecutionWithRecord {
+    execution: CrawlingExecution & IdEntity;
+    record: WebsiteRecord & IdEntity;
 }
 
 @Component({

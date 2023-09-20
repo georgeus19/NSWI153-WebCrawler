@@ -7,11 +7,7 @@ import { WebsiteRecordsService } from '../website-records.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormControl } from '@angular/forms';
-
-interface ExecutionWithRecord {
-    execution: CrawlingExecutionWithWebsiteRecordId & IdEntity;
-    record: WebsiteRecordWithLastExecution & IdEntity;
-}
+import { ExecutionWithRecord } from '../executions-table/executions-table.component';
 
 @Component({
     selector: 'app-executions-page',
@@ -21,10 +17,6 @@ interface ExecutionWithRecord {
 export class ExecutionsPageComponent implements OnInit {
     constructor(private executionsService: ExecutionsService, private websiteRecordsService: WebsiteRecordsService) {}
     executions: ExecutionWithRecord[] = [];
-    labelFilter = new FormControl('');
-
-    dataSource = new MatTableDataSource<ExecutionWithRecord>([]);
-    columns = ['label', 'execution-status', 'start', 'end', 'number-sites-crawled'];
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     ngOnInit(): void {
@@ -40,30 +32,7 @@ export class ExecutionsPageComponent implements OnInit {
                         record: websiteRecords.find((record) => record.id === execution.websiteRecordId),
                     } as ExecutionWithRecord;
                 });
-                this.dataSource = new MatTableDataSource<ExecutionWithRecord>(this.executions);
-                // this.dataSource.paginator = this.paginator;
-                // this.labelFilter.valueChanges.subscribe((val) => {
-                //     console.log(val);
-                //     if (val) {
-                //         this.dataSource.filter = val.trim().toLowerCase();
-                //     } else {
-                //         this.dataSource.filter = '';
-                //     }
-                // });
-                // this.dataSource.filterPredicate = (e: ExecutionWithRecord, filter: string) => {
-                //     console.log(e, filter);
-                //     const label = e.record.label.trim().toLocaleLowerCase();
-                //     if (label.includes(filter)) {
-                //         return true;
-                //     }
-                //     return false;
-                // };
             });
         });
-    }
-
-    applyFilter(event: Event) {
-        const filterValue = (event.target as HTMLInputElement).value;
-        this.dataSource.filter = filterValue.trim().toLowerCase();
     }
 }

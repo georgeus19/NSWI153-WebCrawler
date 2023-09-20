@@ -30,7 +30,14 @@
         <mat-card-actions>
             <button class="action" mat-raised-button color="primary" (click)="onEdit(websiteRecord)">Edit</button>
             <button class="action" mat-raised-button color="primary" (click)="onDelete()">Delete</button>
-            <button class="action" mat-raised-button color="primary">Crawl</button>
+            <button
+                class="action"
+                mat-raised-button
+                color="primary"
+                routerLink="/{{ routePaths.WEBSITE_RECORD_DETAIL_COMPONENT_PATH }}/{{ websiteRecord.id }}"
+            >
+                Detail
+            </button>
         </mat-card-actions>
     </mat-card-content>
     <!-- Label, Periodicity, Tags, time of last execution, the status of last execution -->

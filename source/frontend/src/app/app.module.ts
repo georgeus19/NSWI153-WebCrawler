@@ -27,6 +27,7 @@ import { WebsiteRecordEditComponent } from './website-record-edit/website-record
 import { ExecutionsPageComponent } from './executions-page/executions-page.component';
 import { MatTableModule } from '@angular/material/table';
 import { ExecutionsTableComponent } from './executions-table/executions-table.component';
+import { WebsiteRecordDetailComponent } from './website-record-detail/website-record-detail.component';
 
 @NgModule({
     declarations: [
@@ -39,6 +40,7 @@ import { ExecutionsTableComponent } from './executions-table/executions-table.co
         WebsiteRecordEditComponent,
         ExecutionsPageComponent,
         ExecutionsTableComponent,
+        WebsiteRecordDetailComponent,
     ],
     imports: [
         BrowserModule,

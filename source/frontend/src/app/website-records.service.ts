@@ -35,8 +35,8 @@ export class WebsiteRecordsService {
         return this.http.delete(this.websiteRecordsUrl);
     }
 
-    getWebsiteRecord(id: string): Observable<WebsiteRecordWithLastExecution> {
-        return this.http.get<WebsiteRecordWithLastExecution>(`${this.websiteRecordsUrl}/${id}`);
+    getWebsiteRecord(id: string): Observable<WebsiteRecordWithLastExecution & IdEntity> {
+        return this.http.get<WebsiteRecordWithLastExecution & IdEntity>(`${this.websiteRecordsUrl}/${id}`);
     }
 
     addWebsiteRecord(websiteRecord: WebsiteRecord): Observable<IdEntity> {
