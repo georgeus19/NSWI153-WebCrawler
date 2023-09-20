@@ -23,14 +23,7 @@
     </mat-form-field>
     <mat-form-field>
         <mat-label>Periodicity</mat-label>
-        <input
-            matInput
-            type="text"
-            [(ngModel)]="periodicity"
-            pattern="^\d{1,2}-\d{1,2}-\d{1,2}$"
-            #periodicityLabel="ngModel"
-            appForbiddenName="00-00-00"
-        />
+        <input matInput type="text" [(ngModel)]="periodicity" pattern="^\d{1,2}-\d{1,2}-\d{1,2}$" #periodicityLabel="ngModel" />
         <div class="validation-error" *ngIf="periodicityLabel.errors?.['pattern'] || !periodicityOk()">
             Periodicity must be at in format DD-hh-mm and not 00-00-00.
         </div>

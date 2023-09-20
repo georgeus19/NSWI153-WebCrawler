@@ -1,0 +1,43 @@
+<!-- <mat-form-field class="filter">
+    <mat-label>Filter</mat-label>
+    <input matInput type="text" [formControl]="labelFilter" />
+</mat-form-field>
+
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="label">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Label</th>
+            <td mat-cell *matCellDef="let row">{{ row.record.label }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="execution-status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Execution Status</th>
+            <td mat-cell *matCellDef="let row">{{ row.execution.status | uppercase }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="start">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Start</th>
+            <td mat-cell *matCellDef="let row">{{ row.execution.start }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="end">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>End</th>
+            <td mat-cell *matCellDef="let row">{{ row.execution.end }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="number-sites-crawled">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Number of Sites Crawled</th>
+            <td mat-cell *matCellDef="let row">{{ row.execution.sitesCrawled }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">No data matching "{{ labelFilter.value }}."</td>
+        </tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+</div> -->
+<app-executions-table [executions]="executions"></app-executions-table>

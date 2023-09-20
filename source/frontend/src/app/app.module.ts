@@ -24,6 +24,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { WebsiteRecordCardComponent } from './website-record-card/website-record-card.component';
 import { WebsiteRecordEditComponent } from './website-record-edit/website-record-edit.component';
+import { ExecutionsPageComponent } from './executions-page/executions-page.component';
+import { MatTableModule } from '@angular/material/table';
+import { ExecutionsTableComponent } from './executions-table/executions-table.component';
 
 @NgModule({
     declarations: [
@@ -34,6 +37,8 @@ import { WebsiteRecordEditComponent } from './website-record-edit/website-record
         WebsiteRecordsPageSortDialogComponent,
         WebsiteRecordCardComponent,
         WebsiteRecordEditComponent,
+        ExecutionsPageComponent,
+        ExecutionsTableComponent,
     ],
     imports: [
         BrowserModule,
@@ -54,6 +59,7 @@ import { WebsiteRecordEditComponent } from './website-record-edit/website-record
         MatInputModule,
         MatButtonToggleModule,
         MatSlideToggleModule,
+        MatTableModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

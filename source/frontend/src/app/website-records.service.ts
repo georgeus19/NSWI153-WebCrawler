@@ -11,7 +11,7 @@ import { stringify, parse } from 'qs';
 export class WebsiteRecordsService {
     constructor(private http: HttpClient) {}
 
-    private websiteRecordsUrl = '/website-records';
+    private websiteRecordsUrl = '/api/website-records';
     httpOptions = {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };

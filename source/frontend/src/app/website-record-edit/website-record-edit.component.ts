@@ -50,7 +50,12 @@ export class WebsiteRecordEditComponent {
     }
 
     okClick(): void {
-        if (this.empty(this.websiteRecord.label) || this.empty(this.websiteRecord.url) || this.empty(this.websiteRecord.boundaryRegExp)) {
+        if (
+            this.empty(this.websiteRecord.label) ||
+            this.empty(this.websiteRecord.url) ||
+            this.empty(this.websiteRecord.boundaryRegExp) ||
+            !this.periodicityOk()
+        ) {
             return;
         }
         this.websiteRecord.tags = this.tags.value;

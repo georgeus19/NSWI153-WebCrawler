@@ -16,7 +16,7 @@ mat-divider {
 header nav {
     display: grid;
     gap: 30px;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     align-items: center;
     justify-self: end;
 }

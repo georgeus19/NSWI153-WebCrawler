@@ -5,9 +5,22 @@
             <h1>WEB CRAWLER</h1>
         </div>
         <nav>
-            <a mat-raised-button color="primary" href="/">Website Records</a>
-            <a mat-raised-button color="primary" href="/">Executions</a>
-            <a mat-raised-button color="primary" href="/">Website Graph</a>
+            <a
+                routerLink="/{{ routePaths.WEBSITE_RECORDS_PAGE_COMPONENT_PATH }}"
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page"
+                mat-raised-button
+                color="primary"
+                >Website Records</a
+            >
+            <a
+                routerLink="/{{ routePaths.EXECUTIONS_PAGE_COMPONENT_PATH }}"
+                routerLinkActive="active"
+                ariaCurrentWhenActive="page"
+                mat-raised-button
+                color="primary"
+                >Executions</a
+            >
         </nav>
     </div>
     <mat-divider></mat-divider>
