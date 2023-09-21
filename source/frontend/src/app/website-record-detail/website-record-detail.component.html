@@ -6,6 +6,8 @@
         (deleteRecordEvent)="onRecordDelete()"
         (updatedRecordEvent)="onRecordUpdate()"
         (updatedTagsEvent)="onTagsUpdate($event)"
+        (newExecutionEvent)="onNewExecution($event)"
+        [showRegexp]="true"
     ></app-website-record-card>
     <app-executions-table [executions]="tableInput"></app-executions-table>
 </div>

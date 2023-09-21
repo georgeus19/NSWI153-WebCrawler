@@ -6,6 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { WebsiteRecordChangeResult, WebsiteRecordEditComponent, WebsiteRecordEditInput } from '../website-record-edit/website-record-edit.component';
 import { fromNumber, toNumber } from '../periodicity';
 import { RoutePaths } from '../app-routing.module';
+import { ExecutionsService } from '../executions.service';
+import { RunningCrawlingExecution } from '@backend/crawling-executor/crawling-execution';
 
 @Component({
     selector: 'app-website-record-card',
@@ -15,11 +17,15 @@ import { RoutePaths } from '../app-routing.module';
 export class WebsiteRecordCardComponent {
     @Input() websiteRecord?: WebsiteRecordWithLastExecution & IdEntity;
     @Input() allTags?: Set<string>;
+    @Input() showRegexp?: boolean;
+    @Input() visualized = false;
     @Output() deleteRecordEvent = new EventEmitter<string>();
+    @Output() newExecutionEvent = new EventEmitter<RunningCrawlingExecution & IdEntity>();
     @Output() updatedRecordEvent = new EventEmitter<WebsiteRecordWithLastExecution & IdEntity>();
     @Output() updatedTagsEvent = new EventEmitter<Set<string>>();
+    @Output() visualizeChangeEvent = new EventEmitter<WebsiteRecord & IdEntity>();
 
-    constructor(private websiteRecordService: WebsiteRecordsService, public dialog: MatDialog) {}
+    constructor(private websiteRecordService: WebsiteRecordsService, private executionsService: ExecutionsService, public dialog: MatDialog) {}
 
     onEdit(websiteRecord: WebsiteRecordWithLastExecution & IdEntity): void {
         const editInput: WebsiteRecordEditInput = {
@@ -54,6 +60,25 @@ export class WebsiteRecordCardComponent {
     onCrawl(): void {
         console.log('do crawling');
     }
+
+    onStartNewExecution(): void {
+        if (this.websiteRecord) {
+            this.executionsService.addExecution(this.websiteRecord.id).subscribe((execution) => {
+                if (this.websiteRecord) {
+                    this.websiteRecord.lastExecution = execution;
+                    // console.log('XXX');
+                    this.newExecutionEvent.emit(execution);
+                }
+            });
+        }
+    }
+
+    onVisualizeChange(): void {
+        console.log('this.websiteRecord?.id', this.websiteRecord?.id);
+        this.visualized = !this.visualized;
+        this.visualizeChangeEvent.emit(this.websiteRecord);
+    }
+
     fromNumber = fromNumber;
     routePaths = RoutePaths;
 }

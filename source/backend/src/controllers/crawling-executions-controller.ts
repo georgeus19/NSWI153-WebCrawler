@@ -7,23 +7,28 @@ import {
     createNewRunningExecution,
 } from '../crawling-executor/crawling-execution';
 import { IdEntity } from '../base-types';
+import { CrawlingExecutor } from '../crawling-executor/executor';
 
-export function createExecutionController(mongoClient: MongoClient) {
+export function createExecutionController(mongoClient: MongoClient, crawlingExecutor: CrawlingExecutor) {
     const recordsCollection = getWebsiteRecordsCollection(mongoClient);
 
-    async function addExecution(websiteRecordId: string): Promise<string | undefined> {
-        const execution = createNewRunningExecution(new ObjectId().toHexString());
+    async function addExecution(websiteRecordId: string): Promise<(RunningCrawlingExecution & IdEntity) | undefined> {
+        const execution: RunningCrawlingExecution & IdEntity = createNewRunningExecution(new ObjectId().toHexString());
         const updateResult = await recordsCollection.updateOne(
             { _id: new ObjectId(websiteRecordId) },
             {
                 $push: {
                     executions: execution,
                 },
+                $set: {
+                    lastExecution: execution,
+                },
             }
         );
 
-        if (updateResult.matchedCount > 0) {
-            return execution.id;
+        if (updateResult.matchedCount > 0 && (updateResult.modifiedCount > 0 || updateResult.upsertedCount > 0)) {
+            crawlingExecutor.addExecution(websiteRecordId, execution.id);
+            return execution;
         } else {
             return undefined;
         }

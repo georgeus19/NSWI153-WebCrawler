@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Collection, MongoClient, ObjectId } from 'mongodb';
 import workerpool from 'workerpool';
-import { StoredWebsiteRecord, WebsiteRecord } from '../website-record';
+import { StoredWebsiteRecord, WebsiteRecord, WebsiteRecordWithLastExecution } from '../website-record';
 import { Redis, RedisOptions } from 'ioredis';
-import { FinishedCrawlingExecution } from './crawling-execution';
+import { CrawlingExecution, FinishedCrawlingExecution, RunningCrawlingExecution, createNewRunningExecution } from './crawling-execution';
 import { getCrawledWebsitesCollection, getWebsiteRecordsCollection } from '../db-access';
 import { SortedSet } from '@rimbu/sorted';
 import { SortedMap } from '@rimbu/core';
@@ -48,13 +48,37 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
         );
     }
 
-    async function runExecution(executionId: string, websiteRecord: WebsiteRecord & IdEntity) {
+    async function startRunningExecutionIfNotStarted(executionId: string, websiteRecord: WebsiteRecordWithLastExecution & IdEntity) {
+        const recordsCollection = getWebsiteRecordsCollection(mongoClient);
+
+        if (!websiteRecord.lastExecution || websiteRecord.lastExecution.id === executionId) {
+            return;
+        }
+
+        const execution: RunningCrawlingExecution & IdEntity = createNewRunningExecution(executionId);
+        const updateResult = await recordsCollection.updateOne(
+            { _id: new ObjectId(websiteRecord.id) },
+            {
+                $push: {
+                    executions: execution,
+                },
+                $set: {
+                    lastExecution: execution,
+                },
+            }
+        );
+        console.log('startRunningExecutionIfNotStarted', updateResult);
+    }
+
+    async function runExecution(executionId: string, websiteRecord: WebsiteRecordWithLastExecution & IdEntity) {
         lastStartedExecutions.set(websiteRecord.id, executionId);
         const runningExecutionId = runningExecutions.get(websiteRecord.id);
+        await startRunningExecutionIfNotStarted(executionId, websiteRecord);
         if (runningExecutionId) {
             await redis.del(runningExecutionId);
         }
         runningExecutions.set(websiteRecord.id, executionId);
+
         const execution = (await pool.exec('runCrawlingExecution', [
             {
                 executionId: executionId,
@@ -83,26 +107,13 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
                         return { executionId: executionId, websiteRecordId: websiteRecord.id, ...JSON.parse(crawledSite) };
                     })
                 );
-
-                const updateResult = await recordsCollection.updateOne(
-                    { _id: new ObjectId(websiteRecord.id), 'executions.id': executionId },
-                    {
-                        $set: {
-                            'executions.$': {
-                                id: executionId,
-                                ...execution,
-                            },
-                            lastExecution: {
-                                id: executionId,
-                                ...execution,
-                            },
-                        },
-                    }
-                );
+                // console.log('executionId', executionId);
+                const updateResult = await updateExecution(recordsCollection, { ...execution, id: executionId }, websiteRecord);
+                console.log('UPDATE RESULT', updateResult);
 
                 if (updateResult.matchedCount > 0 && insertResult.insertedCount == crawledSites.length) {
-                    console.log('successful save');
-                    console.log(updateResult, insertResult);
+                    // console.log('successful save');
+                    // console.log(updateResult, insertResult);
                     await session.commitTransaction();
                 } else {
                     await session.abortTransaction();
@@ -114,22 +125,36 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
                 await session.endSession();
             }
         } else {
-            await recordsCollection.updateOne(
-                { _id: new ObjectId(websiteRecord.id) },
-                {
-                    $set: {
-                        'executions.$[element]': {
-                            id: new ObjectId(executionId),
-                            ...execution,
-                        },
-                    },
-                },
-                { arrayFilters: [{ element: { id: new ObjectId(executionId) } }] }
-            );
+            updateExecution(recordsCollection, { ...execution, id: executionId }, websiteRecord);
         }
         await redis.del(executionId);
+        if (execution.status !== 'cancelled') {
+            const newExecutionId = new ObjectId().toHexString();
+            executionQueue.add({
+                scheduledStartTime: new Date(execution.end.getTime() + websiteRecord.periodicity),
+                executionId: newExecutionId,
+                websiteRecordId: websiteRecord.id,
+            });
+            lastAddedExecutions.set(websiteRecord.id, newExecutionId);
+        }
 
         console.log('execution return', execution);
+    }
+
+    function updateExecution(
+        recordsCollection: Collection<Document>,
+        execution: CrawlingExecution & IdEntity,
+        websiteRecord: WebsiteRecord & IdEntity
+    ) {
+        return recordsCollection.updateOne(
+            { _id: new ObjectId(websiteRecord.id), 'executions.id': execution.id },
+            {
+                $set: {
+                    'executions.$': execution,
+                    lastExecution: execution,
+                },
+            }
+        );
     }
 
     async function runScheduledExecution() {
@@ -139,8 +164,9 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
             const websiteRecord = (await recordsCollection.findOne(
                 { _id: new ObjectId(firstExecution.websiteRecordId) },
                 { projection: { executions: 0 } }
-            )) as WebsiteRecord | null;
+            )) as WebsiteRecordWithLastExecution | null;
             if (websiteRecord) {
+                console.log('XXXXXXXXXXXXXXXX', firstExecution.executionId);
                 runExecution(firstExecution.executionId, { id: firstExecution.websiteRecordId, ...websiteRecord });
             }
             executionQueue.pop();

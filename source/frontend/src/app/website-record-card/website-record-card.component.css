@@ -7,6 +7,11 @@
     background-color: #eee;
 }
 
+.regexp {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
 .action {
     /* margin: auto; */
 
@@ -16,11 +21,16 @@
 }
 
 mat-card-actions {
-    display: flex;
-    justify-items: flex-end;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    /* justify-items: flex-end; */
     align-items: end;
     gap: 10px;
     margin: auto;
+}
+
+.long-action {
+    grid-column: span 3;
 }
 
 .tags {

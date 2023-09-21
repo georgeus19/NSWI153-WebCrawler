@@ -53,14 +53,16 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
     }
 
     async function addWebsiteRecord(websiteRecord: WebsiteRecord): Promise<string | undefined> {
+        const newExecution = createNewRunningExecution(new ObjectId().toHexString());
         const storageRecord: StoredWebsiteRecord = {
             ...websiteRecord,
-            executions: [createNewRunningExecution(new ObjectId().toHexString())],
+            executions: [newExecution],
+            lastExecution: newExecution,
         };
         const insertedDoc = await recordsCollection.insertOne(storageRecord as any);
         const websiteRecordId = insertedDoc.acknowledged ? insertedDoc.insertedId.toHexString() : undefined;
         if (websiteRecordId && websiteRecord.active) {
-            crawlingExecutor.addExecution(websiteRecordId, storageRecord.executions[0].id);
+            crawlingExecutor.addExecution(websiteRecordId, newExecution.id);
         }
         return websiteRecordId;
     }

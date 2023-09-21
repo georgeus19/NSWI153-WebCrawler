@@ -1,10 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { IdEntity } from '@backend/base-types';
-import { CrawlingExecution, CrawlingExecutionWithWebsiteRecordId } from '@backend/crawling-executor/crawling-execution';
-import { WebsiteRecord, WebsiteRecordWithLastExecution } from '@backend/website-record';
+import { CrawlingExecution } from '@backend/crawling-executor/crawling-execution';
+import { WebsiteRecord } from '@backend/website-record';
 
 export interface ExecutionWithRecord {
     execution: CrawlingExecution & IdEntity;
@@ -25,7 +25,13 @@ export class ExecutionsTableComponent implements OnChanges {
     dataSource = new MatTableDataSource<ExecutionWithRecord>([]);
 
     ngOnChanges(changes: SimpleChanges): void {
-        this.dataSource = new MatTableDataSource<ExecutionWithRecord>(this.executions);
+        console.log('MMMMMMMMMMMMMMM');
+        const sortedExecutions = this.executions;
+        sortedExecutions.sort(
+            (a: ExecutionWithRecord, b: ExecutionWithRecord) => new Date(a.execution.start).getTime() + new Date(b.execution.start).getTime()
+        );
+        console.log('sortedExecutions', sortedExecutions);
+        this.dataSource = new MatTableDataSource<ExecutionWithRecord>(sortedExecutions);
         this.dataSource.paginator = this.paginator;
         this.labelFilter.valueChanges.subscribe((val) => {
             console.log(val);

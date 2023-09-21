@@ -28,6 +28,9 @@ import { ExecutionsPageComponent } from './executions-page/executions-page.compo
 import { MatTableModule } from '@angular/material/table';
 import { ExecutionsTableComponent } from './executions-table/executions-table.component';
 import { WebsiteRecordDetailComponent } from './website-record-detail/website-record-detail.component';
+import { MatSortModule } from '@angular/material/sort';
+import { WebsiteGraphComponent } from './website-graph/website-graph.component';
+import { NodeDetailDialogComponent } from './node-detail-dialog/node-detail-dialog.component';
 
 @NgModule({
     declarations: [
@@ -41,6 +44,8 @@ import { WebsiteRecordDetailComponent } from './website-record-detail/website-re
         ExecutionsPageComponent,
         ExecutionsTableComponent,
         WebsiteRecordDetailComponent,
+        WebsiteGraphComponent,
+        NodeDetailDialogComponent,
     ],
     imports: [
         BrowserModule,
@@ -62,6 +67,7 @@ import { WebsiteRecordDetailComponent } from './website-record-detail/website-re
         MatButtonToggleModule,
         MatSlideToggleModule,
         MatTableModule,
+        MatSortModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

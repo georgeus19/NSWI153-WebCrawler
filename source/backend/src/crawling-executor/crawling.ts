@@ -1,6 +1,7 @@
 import * as htmlparser2 from 'htmlparser2';
 import axios from 'axios';
 import { CrawlRecord, FinishedCrawlingExecutionStatus } from './crawling-execution';
+import isUrl from 'is-url';
 
 export async function crawl(
     website: string,
@@ -24,10 +25,19 @@ export async function crawl(
             return 'cancelled';
         }
         if (successfulScrape(scrapeResult)) {
-            const links = scrapeResult.links.map((link) => {
-                const url = new URL(link, websiteToCrawl);
-                return url.origin + url.pathname;
-            });
+            const links = scrapeResult.links
+                .filter((link) => {
+                    try {
+                        const url = new URL(link, websiteToCrawl);
+                        return true;
+                    } catch {
+                        return false;
+                    }
+                })
+                .map((link) => {
+                    const url = new URL(link, websiteToCrawl);
+                    return url.origin + url.pathname;
+                });
             websitesToCrawlQueue.push(...links.filter((link) => boundaryRegexp.test(link) && !alreadyCrawledWebsites.has(link)));
             await saveCrawlRecord({
                 url: websiteToCrawl,
@@ -50,8 +60,14 @@ function successfulScrape(result: { title: string; links: string[] } | { error: 
 }
 
 async function scrape(webpage: string): Promise<{ title: string; links: string[] } | { error: boolean }> {
+    if (!isUrl(webpage)) {
+        return {
+            title: '',
+            links: [],
+        };
+    }
     try {
-        const response = await axios.get(webpage, { responseType: 'text' });
+        const response = await axios.get(webpage, { responseType: 'text', timeout: 2000 });
         const html: string = response.data;
         const links: string[] = [];
         let title: string = '';
@@ -87,6 +103,7 @@ async function scrape(webpage: string): Promise<{ title: string; links: string[]
             links: links,
         };
     } catch (error) {
+        // console.log('crawl error:', error);
         return { error: true };
     }
 }

@@ -5,15 +5,18 @@
     <mat-card-content>
         <h3 class="url">{{ websiteRecord.url }}</h3>
         <mat-divider></mat-divider>
-        <h3>Boundary RegExp: {{ websiteRecord.boundaryRegExp }}</h3>
+        <h3 *ngIf="showRegexp">Boundary RegExp: {{ websiteRecord.boundaryRegExp }}</h3>
         <h3>Periodicity: {{ fromNumber(websiteRecord.periodicity) }}</h3>
         <h3>Status: {{ websiteRecord.active ? 'Active' : 'Inactive' }}</h3>
         <mat-divider></mat-divider>
         <h3>Last Execution:</h3>
         <div class="last-execution" *ngIf="websiteRecord.lastExecution">
-            <div>Start: {{ websiteRecord.lastExecution.start }}</div>
+            <div>Start: {{ websiteRecord.lastExecution.start | date : 'medium' }}</div>
             <div *ngIf="websiteRecord.lastExecution.status !== 'running'"></div>
-            <div>End: {{ websiteRecord.lastExecution.status !== 'running' ? websiteRecord.lastExecution.end : 'Not finished yet.' }}</div>
+            <div>
+                End:
+                {{ websiteRecord.lastExecution.status !== 'running' ? (websiteRecord.lastExecution.end | date : 'medium') : 'Not finished yet.' }}
+            </div>
             <div>Status: {{ websiteRecord.lastExecution.status | uppercase }}</div>
         </div>
         <div class="last-execution" *ngIf="!websiteRecord.lastExecution">
@@ -38,6 +41,11 @@
             >
                 Detail
             </button>
+            <button class="action long-action" mat-raised-button color="primary" (click)="onStartNewExecution()">Start New Execution</button>
+            <mat-button-toggle class="action long-action" mat-raised-button color="primary" (change)="onVisualizeChange()" [checked]="visualized"
+                >Visualize</mat-button-toggle
+            >
+            <!-- <button    (click)="onStartNewExecution()">Visualize</button> -->
         </mat-card-actions>
     </mat-card-content>
     <!-- Label, Periodicity, Tags, time of last execution, the status of last execution -->

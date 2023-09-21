@@ -1,7 +1,7 @@
 import { crawl } from './crawling';
 import { Redis, RedisOptions } from 'ioredis';
 import workerpool from 'workerpool';
-import { CrawlRecord, FinishedCrawlingExecution } from './crawling-execution';
+import { CrawlRecord, FinishedCrawlingExecution, FinishedCrawlingExecutionStatus } from './crawling-execution';
 
 export interface WorkerInput {
     executionId: string;
@@ -34,9 +34,20 @@ async function runCrawlingExecution(workerInput: WorkerInput): Promise<FinishedC
         return cancelCrawling;
     };
 
-    // crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
-    const status = await crawl(url, new RegExp(boundaryRegexp), saveCrawlRecord, cancel);
+    let status: FinishedCrawlingExecutionStatus;
+    try {
+        status = await crawl(url, new RegExp(boundaryRegexp), saveCrawlRecord, cancel);
+    } catch (error) {
+        console.log(error);
+        return {
+            start: startTime,
+            end: new Date(Date.now()),
+            sitesCrawled: count,
+            status: 'failed',
+        };
+    }
     const endTime = new Date(Date.now());
+    // crawling.crawl('https://www.zelezarstvizizkov.cz/', new RegExp('^http.*'), saveCrawlRecord, cancel)
     redis.disconnect();
     return {
         start: startTime,

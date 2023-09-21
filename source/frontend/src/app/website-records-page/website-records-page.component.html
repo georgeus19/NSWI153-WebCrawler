@@ -16,6 +16,8 @@
         (deleteRecordEvent)="onRecordDelete()"
         (updatedRecordEvent)="onRecordUpdate()"
         (updatedTagsEvent)="onTagsUpdate($event)"
+        (visualizeChangeEvent)="onVisualizeChangeEvent($event)"
+        [visualized]="activeVisualizationSelection.has(websiteRecord.id)"
     ></app-website-record-card>
 </div>
 <mat-paginator
@@ -29,3 +31,5 @@
     aria-label="Select page"
 >
 </mat-paginator>
+
+<app-website-graph [websiteRecords]="activeSelection" (graphDetailEvent)="onGraphNodeDetailEvent($event)"></app-website-graph>

@@ -9,6 +9,7 @@ import { SortedSet } from '@rimbu/sorted';
 import BTree from 'sorted-btree';
 import { Heap } from 'heap-js';
 import { Redis } from 'ioredis';
+import { addCrawledWebsitesApi } from './api/crawled-websites';
 
 const mongoUri = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.5';
 const mongoClient = new MongoClient(mongoUri);
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 
 const executor = createCrawlingExecutor(mongoClient, { port: 6379, host: '127.0.0.1' });
 addWebsiteRecordsApi(app, mongoClient, executor);
+addCrawledWebsitesApi(app, mongoClient);
 addCrawlExecutionsApi(app, mongoClient, executor);
 
 executor.start();

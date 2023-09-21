@@ -27,6 +27,10 @@ export interface CrawlRecord {
     links: string[];
 }
 
+export interface CrawlRecordWithOwner extends CrawlRecord {
+    websiteRecordId: string;
+}
+
 export function createNewRunningExecution(executionId: string): RunningCrawlingExecution & IdEntity {
     return {
         id: executionId,
