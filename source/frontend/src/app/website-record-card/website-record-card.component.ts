@@ -66,7 +66,7 @@ export class WebsiteRecordCardComponent {
             this.executionsService.addExecution(this.websiteRecord.id).subscribe((execution) => {
                 if (this.websiteRecord) {
                     this.websiteRecord.lastExecution = execution;
-                    // console.log('XXX');
+                    console.log('XXX');
                     this.newExecutionEvent.emit(execution);
                 }
             });

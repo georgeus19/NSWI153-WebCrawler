@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { WebsiteRecordsService } from '../website-records.service';
-import { SortParams, WebsiteRecord, WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
+import { PagedResults, SortParams, WebsiteRecord, WebsiteRecordParams, WebsiteRecordWithLastExecution } from '@backend/website-record';
 import { IdEntity, Pagination } from '@backend/base-types';
 import { PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,7 +12,7 @@ import { SortData, WebsiteRecordsPageSortDialogComponent } from '../website-reco
 import { WebsiteRecordChangeResult, WebsiteRecordEditComponent, WebsiteRecordEditInput } from '../website-record-edit/website-record-edit.component';
 import { GraphNode } from '../website-graph/website-graph.component';
 import { CreateWebsiteRecordResult, NodeDetailDialogComponent } from '../node-detail-dialog/node-detail-dialog.component';
-import { Observable } from 'rxjs';
+import { Observable, Subject, connectable, multicast, share } from 'rxjs';
 
 @Component({
     selector: 'app-website-records-page',
@@ -22,19 +22,21 @@ import { Observable } from 'rxjs';
 export class WebsiteRecordsPageComponent implements OnInit {
     websiteRecords: (WebsiteRecordWithLastExecution & IdEntity)[] = [];
     pagination: Pagination = { length: 0 };
-    pageSize = 12;
+    pageSize = 6;
     pageIndex = 0;
     filterData: FilterData = { tags: [], allTags: new Set<string>() };
     sortData: SortData = { sortBy: 'lastExecution', asc: 'desc' };
     activeVisualizationSelection: Set<string> = new Set<string>();
     activeSelection: (WebsiteRecord & IdEntity)[] = [];
+    change = false;
+    liveMode = false;
     constructor(private websiteRecordsService: WebsiteRecordsService, public dialog: MatDialog) {}
     ngOnInit(): void {
         this.refresh();
     }
 
     refresh(): void {
-        this.pageSize = 12;
+        this.pageSize = 6;
         this.pageIndex = 0;
         this.filterData = { tags: [], allTags: new Set<string>() };
         this.sortData = { sortBy: 'lastExecution', asc: 'desc' };
@@ -63,13 +65,18 @@ export class WebsiteRecordsPageComponent implements OnInit {
             label: this.filterData.label,
             tags: this.filterData.tags.length > 0 ? this.filterData.tags : undefined,
         };
-        const fetchData = this.websiteRecordsService.getWebsiteRecords({ pagination: pagination, filter: filter, sort: this.sortData });
+        const subject = new Subject<PagedResults<(WebsiteRecordWithLastExecution & IdEntity)[]>>();
+        const fetchData = this.websiteRecordsService.getWebsiteRecords({ pagination: pagination, filter: filter, sort: this.sortData }).pipe(share());
+        // const multicasted = connectable(fetchData, { connector: () => new Subject() });
+
+        // const multicasted = fetchData.pipe(multicast(subject));
         fetchData.subscribe((websiteRecords) => {
             console.log(websiteRecords);
             this.websiteRecords = websiteRecords.data;
             console.log(this.websiteRecords);
             this.pagination = websiteRecords.pagination;
         });
+        // multicasted.connect();
         return fetchData;
     }
 
@@ -81,7 +88,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
             if (resultFilterData) {
                 this.filterData = resultFilterData;
                 console.log('filterData', this.filterData);
-                this.pageSize = 12;
+                this.pageSize = 6;
                 this.pageIndex = 0;
                 this.getWebsiteRecords();
             }
@@ -95,7 +102,7 @@ export class WebsiteRecordsPageComponent implements OnInit {
         sortDialogRef.afterClosed().subscribe((resultSortData) => {
             if (resultSortData) {
                 this.sortData = resultSortData;
-                this.pageSize = 12;
+                this.pageSize = 6;
                 this.pageIndex = 0;
                 this.getWebsiteRecords();
             }
@@ -108,6 +115,11 @@ export class WebsiteRecordsPageComponent implements OnInit {
 
     onRecordUpdate(): void {
         this.getWebsiteRecords();
+    }
+
+    onNewExecution(): void {
+        this.change = !this.change;
+        console.log('XX');
     }
 
     onTagsUpdate(tags: Set<string>): void {
@@ -143,11 +155,11 @@ export class WebsiteRecordsPageComponent implements OnInit {
     }
 
     onVisualizeChangeEvent(websiteRecord: WebsiteRecord & IdEntity) {
-        this.activeSelection.push(websiteRecord);
+        const xxx = [...this.activeSelection, websiteRecord];
         if (!this.activeVisualizationSelection.delete(websiteRecord.id)) {
             this.activeVisualizationSelection.add(websiteRecord.id);
         }
-        this.activeSelection = this.activeSelection.filter((record) => this.activeVisualizationSelection.has(record.id));
+        this.activeSelection = xxx.filter((record) => this.activeVisualizationSelection.has(record.id));
         console.log(this.activeVisualizationSelection);
     }
 
@@ -164,6 +176,9 @@ export class WebsiteRecordsPageComponent implements OnInit {
                                 this.getWebsiteRecords().subscribe((x) => {
                                     this.onVisualizeChangeEvent(record);
                                     // Change to live mode.
+                                    this.liveMode = true;
+                                    this.liveMode = false;
+                                    this.liveMode = true;
                                 });
                             });
                         });

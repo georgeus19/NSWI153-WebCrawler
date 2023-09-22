@@ -34,7 +34,11 @@ export function createWebsiteRecordController(mongoClient: MongoClient, crawling
         console.log(params.pagination);
         console.log('params.sort', params.sort);
         if (params.sort && params.sort.sortBy) {
-            querySpecification = querySpecification.sort(params.sort.sortBy, params.sort.asc);
+            if (params.sort.sortBy === 'lastExecution') {
+                querySpecification = querySpecification.sort('lastExecution.start', params.sort.asc);
+            } else {
+                querySpecification = querySpecification.sort(params.sort.sortBy, params.sort.asc);
+            }
         }
         if (params.pagination) {
             querySpecification = querySpecification.skip(params.pagination.skip).limit(params.pagination.limit);

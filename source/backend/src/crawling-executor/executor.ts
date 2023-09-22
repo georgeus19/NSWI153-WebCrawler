@@ -158,27 +158,29 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
     }
 
     async function runScheduledExecution() {
-        const recordsCollection = getWebsiteRecordsCollection(mongoClient);
-        let firstExecution = executionQueue.peek();
-        while (firstExecution && firstExecution.scheduledStartTime < new Date(Date.now())) {
-            const websiteRecord = (await recordsCollection.findOne(
-                { _id: new ObjectId(firstExecution.websiteRecordId) },
-                { projection: { executions: 0 } }
-            )) as WebsiteRecordWithLastExecution | null;
-            if (websiteRecord) {
-                console.log('XXXXXXXXXXXXXXXX', firstExecution.executionId);
-                runExecution(firstExecution.executionId, { id: firstExecution.websiteRecordId, ...websiteRecord });
+        try {
+            const recordsCollection = getWebsiteRecordsCollection(mongoClient);
+            let firstExecution = executionQueue.peek();
+            while (firstExecution && firstExecution.scheduledStartTime < new Date(Date.now())) {
+                const websiteRecord = (await recordsCollection.findOne(
+                    { _id: new ObjectId(firstExecution.websiteRecordId) },
+                    { projection: { executions: 0 } }
+                )) as WebsiteRecordWithLastExecution | null;
+                if (websiteRecord) {
+                    console.log('XXXXXXXXXXXXXXXX', firstExecution.executionId);
+                    runExecution(firstExecution.executionId, { id: firstExecution.websiteRecordId, ...websiteRecord });
+                }
+                executionQueue.pop();
+                firstExecution = executionQueue.peek();
             }
-            executionQueue.pop();
-            firstExecution = executionQueue.peek();
+        } catch (error) {
+            console.log(error);
         }
     }
 
     function start() {
-        setInterval(runScheduledExecution, 1000);
+        setInterval(runScheduledExecution, 300);
     }
-
-    // pool.terminate();
 
     return {
         addExecution,
@@ -186,47 +188,3 @@ export function createCrawlingExecutor(mongoClient: MongoClient, redisOptions: R
         start,
     };
 }
-
-// const x = await pool.exec('runCrawlingExecution', [
-//     {
-//         executionId: 'executionCrawlRecords-' + uuidv4(),
-//         url: 'https://www.zelezarstvizizkov.cz/',
-//         boundaryRegexp: '^http.*',
-//         redisOptions: redisOptions,
-//     },
-// ]);
-
-// await recordsCollection.find().filter({executions: {status: 'finished'}}).sort({'executions.endTime': -1}).limit(1).project().next();
-
-// const lastFinishedExecution = await recordsCollection
-//     .aggregate([
-//         {
-//             $match: {
-//                 _id: new ObjectId(websiteRecordId),
-//             },
-//         },
-//         { $project: { _id: 0, executions: 1 } },
-//         { $unwind: '$executions' },
-//         { $replaceWith: '$executions' },
-//         { $filter: { status: 'finished' } },
-//         { $group: { _id: null, lastFinishedExecution: { $max: '$endTime' } } },
-//     ])
-//     .next();
-// websiteRecord.executions = websiteRecord.executions.filter(e => e.).sort((a, b) => {
-//     if (a.status === 'finished' && b.status !== 'finished') {
-//         return -1;
-//     }
-
-//     if (a.status !== 'finished' && b.status === 'finished') {
-//         return 1;
-//     }
-
-//     if (a.status === 'finished' && b.status === 'finished') {
-//         return new Date(a.end).getTime() - new Date(b.end).getTime();
-//     }
-
-//     return 0;
-// });
-// if (websiteRecord.executions.length > 0) {
-//     websiteRecord.executions[0];
-// }

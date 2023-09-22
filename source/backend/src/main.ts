@@ -1,66 +1,49 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import { addWebsiteRecordsApi } from './api/website-records';
 import bodyParser from 'body-parser';
 import { addCrawlExecutionsApi } from './api/crawl-executions';
 import { createCrawlingExecutor } from './crawling-executor/executor';
-import { SortedMap } from '@rimbu/core';
-import { SortedSet } from '@rimbu/sorted';
-import BTree from 'sorted-btree';
-import { Heap } from 'heap-js';
-import { Redis } from 'ioredis';
 import { addCrawledWebsitesApi } from './api/crawled-websites';
 
-const mongoUri = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.10.5';
+import { graphqlHTTP } from 'express-graphql';
+import dotenv from 'dotenv';
+import { addWebSocketServer } from './api/websocket';
+import { createGraphQLSchema } from './api/graphql';
+
+dotenv.config();
+
+const mongoUri: string = process.env.MONGO!;
+// const mongoUri = 'mongodb://mongo:27017';
 const mongoClient = new MongoClient(mongoUri);
 const app = express();
+
+const ws = addWebSocketServer();
 
 app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded());
 
-const executor = createCrawlingExecutor(mongoClient, { port: 6379, host: '127.0.0.1' });
+const schema = createGraphQLSchema(mongoClient);
+
+app.use(
+    '/graphql',
+    graphqlHTTP({
+        schema: schema,
+        graphiql: true,
+    })
+);
+
+const executor = createCrawlingExecutor(mongoClient, { port: 6379, host: process.env.REDIS });
 addWebsiteRecordsApi(app, mongoClient, executor);
 addCrawledWebsitesApi(app, mongoClient);
 addCrawlExecutionsApi(app, mongoClient, executor);
 
 executor.start();
 
+app.use((err: any, req: any, res: any, next: any) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
 app.listen(3000, () => {
     console.log('App listening on port 3000');
 });
-// let websiteRecordExecutionSchedule = SortedMap.empty<string, number>();
-// websiteRecordExecutionSchedule = websiteRecordExecutionSchedule.addEntry(['aahoj', 3]);
-// websiteRecordExecutionSchedule = websiteRecordExecutionSchedule.addEntry(['test', 4]);
-// websiteRecordExecutionSchedule = websiteRecordExecutionSchedule.addEntry(['ahoj', 2]);
-// console.log(websiteRecordExecutionSchedule.min());
-// console.log(websiteRecordExecutionSchedule.min());
-interface XX {
-    ts: number;
-    id: string;
-}
-// let tree = new BTree(undefined, (a, b) => {
-//     if (a.score > b.score) {
-//         return 1;
-//     } else if (a.score < b.score) {
-//         return -1;
-//     } else {
-//         return 0;
-//     }
-// });
-
-const heap = new Heap((a: XX, b: XX) => a.ts - b.ts);
-heap.push({ ts: 22324, id: 'id1' });
-heap.push({ ts: 3223, id: 'id1' });
-heap.push({ ts: 2, id: 'id1' });
-heap.push({ ts: 2332, id: 'id1' });
-heap.push({ ts: 323333, id: 'id1' });
-console.log(heap.peek());
-console.log(heap.pop());
-console.log(heap.peek());
-console.log(heap.pop());
-console.log(heap.peek());
-console.log(heap.pop());
-console.log(heap.peek());
-console.log(heap.pop());
-// const exe = createCrawlingExecutor();
-// exe.runExecution();

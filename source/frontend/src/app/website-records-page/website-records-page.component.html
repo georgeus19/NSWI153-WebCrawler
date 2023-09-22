@@ -16,6 +16,7 @@
         (deleteRecordEvent)="onRecordDelete()"
         (updatedRecordEvent)="onRecordUpdate()"
         (updatedTagsEvent)="onTagsUpdate($event)"
+        (newExecutionEvent)="onNewExecution()"
         (visualizeChangeEvent)="onVisualizeChangeEvent($event)"
         [visualized]="activeVisualizationSelection.has(websiteRecord.id)"
     ></app-website-record-card>
@@ -31,5 +32,10 @@
     aria-label="Select page"
 >
 </mat-paginator>
-
-<app-website-graph [websiteRecords]="activeSelection" (graphDetailEvent)="onGraphNodeDetailEvent($event)"></app-website-graph>
+<mat-slide-toggle [(ngModel)]="liveMode">{{ liveMode ? 'Live Mode' : 'Offline Mode' }}</mat-slide-toggle>
+<app-website-graph
+    [change]="change"
+    [liveMode]="liveMode"
+    [websiteRecords]="activeSelection"
+    (graphDetailEvent)="onGraphNodeDetailEvent($event)"
+></app-website-graph>

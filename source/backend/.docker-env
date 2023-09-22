@@ -1,0 +1,2 @@
+MONGO=mongodb://mongo:27017
+REDIS=redis

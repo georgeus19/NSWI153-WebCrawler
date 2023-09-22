@@ -17,7 +17,7 @@ export interface CreateWebsiteRecordResult {
     styleUrls: ['./node-detail-dialog.component.css'],
 })
 export class NodeDetailDialogComponent {
-    node: GraphNode;
+    node: any;
     constructor(
         public dialogRef: MatDialogRef<NodeDetailDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public nodeInput: GraphNode,
@@ -25,6 +25,7 @@ export class NodeDetailDialogComponent {
         private crawledWebsitesService: CrawledWebsitesService
     ) {
         this.node = structuredClone(nodeInput);
+        (this.node as any).val.websiteRecords = [];
         crawledWebsitesService.getWebsiteRecords(this.node.val.url).subscribe((websiteRecords: (WebsiteRecordWithLastExecution & IdEntity)[]) => {
             (this.node as any).val.websiteRecords = websiteRecords;
         });

@@ -1,25 +1,27 @@
-<h1 mat-dialog-title>Node Detail</h1>
-<div *ngIf="node.val.crawled">
-    <h2>URL: {{ node.val.url }}</h2>
-    <h2>Crawl Time:{{ node.val.crawlTime }}</h2>
-    <h2>Website Records:</h2>
-    <div class="card" *ngFor="let websiteRecord of node.val.websiteRecords">
-        <mat-card>
-            <mat-card-header>
-                <mat-card-title>Label: {{ websiteRecord.label }}</mat-card-title>
-            </mat-card-header>
-            <mat-card-actions>
-                <button mat-raised-button (click)="startExecution(websiteRecord)">Start Execution</button>
-            </mat-card-actions>
-        </mat-card>
+<div class="container">
+    <h1 mat-dialog-title>Node Detail</h1>
+    <div *ngIf="node.val.crawled">
+        <h2>URL: {{ node.val.url }}</h2>
+        <h2>Crawl Time: {{ node.val.crawlTime | date : 'medium' }}</h2>
+        <h2>Website Records:</h2>
+        <div class="card" *ngFor="let websiteRecord of node.val.websiteRecords">
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>Label: {{ websiteRecord.label }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-actions>
+                    <button mat-raised-button (click)="startExecution(websiteRecord)">Start Execution</button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+        <div mat-dialog-actions>
+            <button mat-button (click)="onNoClick()" cdkFocusInitial>Close</button>
+        </div>
     </div>
-    <div mat-dialog-actions>
-        <button mat-button (click)="onNoClick()" cdkFocusInitial>Close</button>
-    </div>
-</div>
-<div *ngIf="!node.val.crawled">
-    <div mat-dialog-actions>
-        <button mat-button (click)="onNoClick()">Close</button>
-        <button mat-button (click)="createWebsiteRecordClick()" cdkFocusInitial>Create Website Record</button>
+    <div *ngIf="!node.val.crawled">
+        <div mat-dialog-actions>
+            <button mat-button (click)="onNoClick()">Close</button>
+            <button mat-button (click)="createWebsiteRecordClick()" cdkFocusInitial>Create Website Record</button>
+        </div>
     </div>
 </div>

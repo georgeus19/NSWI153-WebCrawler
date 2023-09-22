@@ -16,46 +16,62 @@ export function addCrawlExecutionsApi(app: express.Express, mongoClient: MongoCl
         sitesCrawled: z.number(),
         status: z.string().regex(new RegExp('^(finished)|(failed)$')),
     });
-    app.get('/website-records-crawl-executions', async (request, response) => {
-        const executionController = createExecutionController(mongoClient, executor);
-        const executions = await executionController.getExecutions();
-        response.json(executions);
-        response.status(StatusCodes.OK);
-    });
-
-    app.post('/website-records/:websiteRecordId/crawl-executions', async (request, response) => {
-        const executionController = createExecutionController(mongoClient, executor);
-        const execution = await executionController.addExecution(request.params.websiteRecordId);
-        if (execution) {
-            response.json(execution);
-            response.status(StatusCodes.CREATED);
-        } else {
-            response.send(ReasonPhrases.BAD_REQUEST);
-            response.status(StatusCodes.BAD_REQUEST);
+    app.get('/api/website-records-crawl-executions', async (request, response, next) => {
+        try {
+            const executionController = createExecutionController(mongoClient, executor);
+            const executions = await executionController.getExecutions();
+            response.json(executions);
+            response.status(StatusCodes.OK);
+        } catch (error) {
+            next(error);
         }
     });
 
-    app.get('/website-records/:websiteRecordId/crawl-executions', async (request, response) => {
-        const executionController = createExecutionController(mongoClient, executor);
-        const executions = await executionController.getExecutions(request.params.websiteRecordId);
-        if (executions) {
-            response.send(executions);
-            response.status(StatusCodes.OK);
-        } else {
-            response.send(ReasonPhrases.NOT_FOUND);
-            response.status(StatusCodes.NOT_FOUND);
+    app.post('/api/website-records/:websiteRecordId/crawl-executions', async (request, response, next) => {
+        try {
+            const executionController = createExecutionController(mongoClient, executor);
+            const execution = await executionController.addExecution(request.params.websiteRecordId);
+            if (execution) {
+                response.json(execution);
+                response.status(StatusCodes.CREATED);
+            } else {
+                response.send(ReasonPhrases.BAD_REQUEST);
+                response.status(StatusCodes.BAD_REQUEST);
+            }
+        } catch (error) {
+            next(error);
         }
     });
 
-    app.get('/website-records/:websiteRecordId/crawl-executions/:executionId', async (request, response) => {
-        const executionController = createExecutionController(mongoClient, executor);
-        const execution = await executionController.getExecution(request.params.websiteRecordId, request.params.executionId);
-        if (execution) {
-            response.send(execution);
-            response.status(StatusCodes.OK);
-        } else {
-            response.status(StatusCodes.NOT_FOUND);
-            response.send(ReasonPhrases.NOT_FOUND);
+    app.get('/api/website-records/:websiteRecordId/crawl-executions', async (request, response, next) => {
+        try {
+            const executionController = createExecutionController(mongoClient, executor);
+            const executions = await executionController.getExecutions(request.params.websiteRecordId);
+            if (executions) {
+                response.send(executions);
+                response.status(StatusCodes.OK);
+            } else {
+                response.send(ReasonPhrases.NOT_FOUND);
+                response.status(StatusCodes.NOT_FOUND);
+            }
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    app.get('/api/website-records/:websiteRecordId/crawl-executions/:executionId', async (request, response, next) => {
+        try {
+            const executionController = createExecutionController(mongoClient, executor);
+            const execution = await executionController.getExecution(request.params.websiteRecordId, request.params.executionId);
+            if (execution) {
+                response.send(execution);
+                response.status(StatusCodes.OK);
+            } else {
+                response.status(StatusCodes.NOT_FOUND);
+                response.send(ReasonPhrases.NOT_FOUND);
+            }
+        } catch (error) {
+            next(error);
         }
     });
 }

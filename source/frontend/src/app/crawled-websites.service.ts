@@ -17,9 +17,9 @@ export class CrawledWebsitesService {
         headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     };
 
-    getCrawledWebsites(websiteRecords: string[]): Observable<CrawlRecordWithOwner[]> {
+    getCrawledWebsites(websiteRecords: string[]): Observable<CrawlRecord[]> {
         const params = { websiteRecords: websiteRecords };
-        return this.http.get<CrawlRecordWithOwner[]>(`${this.crawledWebsitesUrl}?${stringify(params)}`);
+        return this.http.get<CrawlRecord[]>(`${this.crawledWebsitesUrl}?${stringify(params)}`);
     }
 
     getWebsiteRecords(website: string): Observable<(WebsiteRecordWithLastExecution & IdEntity)[]> {
