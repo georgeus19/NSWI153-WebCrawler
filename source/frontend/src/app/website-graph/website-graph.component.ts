@@ -100,9 +100,6 @@ export class WebsiteGraphComponent implements OnChanges {
             ws.onMessage((data: ExecutionSitesUpdate) => {
                 if (!data.executionFinished) {
                     console.log('XX', data.crawlRecords);
-                    // const { nodes, links } = this.graph.graphData();
-                    // const { newNodes, newLinks }: any = this.createWebsiteGraph(data.crawlRecords);
-                    // console.log('new nodes links', newNodes, newLinks);
                     const graphData = this.createWebsiteGraph(data.crawlRecords);
                     console.log('GG', graphData);
                     this.graph.graphData(graphData);

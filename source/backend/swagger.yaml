@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+    title: Web Crawler
+    description: |-
+        Web Crawler imple from https://webik.ms.mff.cuni.cz/nswi153/seminar-project.html
+    termsOfService: http://swagger.io/terms/
+    contact:
+        email: sadsad@exampl.com
+    license:
+        name: Apache 2.0
+        url: http://www.apache.org/licenses/LICENSE-2.0.html
+    version: 1.0.11
+externalDocs:
+    description: Find out more about Swagger
+    url: http://swagger.io
+servers:
+    - url: http://localhost:80
+paths:
+    /website-records:
+        get:
+            summary: Get website records
+            description: Get website records with optional paging, filtering and sorting
+            operationId: getWebsiteRecords
+            parameters:
+                - name: skip
+                  in: query
+                  description: Paging skip
+                  required: false
+                  schema:
+                      type: number
+                - name: limit
+                  in: query
+                  description: Paging limit
+                  required: false
+                  schema:
+                      type: number
+                - name: sortBy
+                  in: query
+                  description: Field which the records are sorted by
+                  required: false
+                  schema:
+                      type: string
+                - name: asc
+                  in: query
+                  description: Sort order
+                  required: false
+                  schema:
+                      type: string
+                - name: url
+                  in: query
+                  description: If filter by url and which one
+                  required: false
+                  schema:
+                      type: string
+                - name: label
+                  in: query
+                  description: If filter by label and which one
+                  required: false
+                  schema:
+                      type: string
+                - name: tags
+                  in: query
+                  description: If filter by tags and which ones
+                  required: false
+                  schema:
+                      type: string
+            responses:
+                '200':
+                    description: successful operation
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/WebsiteRecord'
+                '400':
+                    description: Invalid query parameters
+        post:
+            summary: Add new website record
+            description: Add new website record and possibly start crawling for it
+            operationId: addWebsiteRecord
+            requestBody:
+                description: Create Website record
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WebsiteRecord'
+                required: true
+            responses:
+                '201':
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WebsiteRecord'
+                '400':
+                    description: Invalid input
+    /website-records/{id}:
+        get:
+            summary: Finds website record by id
+            description: Finds website record by id
+            operationId: findWebsiteRecordById
+            parameters:
+                - name: id
+                  in: path
+                  description: website record id
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                '200':
+                    description: successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WebsiteRecord'
+                '400':
+                    description: Invalid website record id
+        put:
+            summary: Update an existing website record
+            description: Update an existing website record by Id
+            operationId: updateWebsiteRecord
+            parameters:
+                - name: id
+                  in: path
+                  description: Website record id to delete
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                description: website record
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WebsiteRecord'
+                required: true
+            responses:
+                '200':
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WebsiteRecord'
+                '400':
+                    description: Invalid id or request data
+        delete:
+            summary: Deletes a website record
+            description: Deletes a website record
+            operationId: deleteWebsiteRecord
+            parameters:
+                - name: id
+                  in: path
+                  description: Website record id to delete
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                '400':
+                    description: Invalid website record
+components:
+    WebsiteRecord:
+        required:
+            - id
+            - url
+        type: object
+        properties:
+            id:
+                type: string
+            url:
+                type: string
+            boundaryRegExp:
+                type: string
+            periodicity:
+                type: number
+            label:
+                type: string
+            active:
+                type: boolean
+            tags:
+                type: array
+                items:
+                    type: string

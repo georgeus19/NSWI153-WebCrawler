@@ -16,7 +16,6 @@ export class ExecutionsSocketService {
 
     onMessage(f: (data: ExecutionSitesUpdate) => void) {
         this.ws.onmessage = function (event) {
-            // console.log('Received by WS', event);
             const data = JSON.parse(event.data);
             f(data);
         };
@@ -25,16 +24,7 @@ export class ExecutionsSocketService {
     send(executionIds: string[]) {
         this.ws.onopen = (event) => {
             console.log('Open web socket');
-            // if (this.ws.readyState === 1) {
-            // console.log('Send by WS', executionIds);
             this.ws.send(JSON.stringify(executionIds));
-            console.log('X');
-            // } else {
-            // setTimeout(() => {
-            // console.log('Send by WS', executionIds);
-            // this.ws.send(JSON.stringify(executionIds));
-            // }, 300);
-            // }
         };
     }
 }

@@ -12,22 +12,13 @@ export function addWebsiteRecordsApi(app: express.Express, mongoClient: MongoCli
     const websiteRecordIdParam = 'websiteRecordId';
     const websiteRecordPath = websiteRecordsPath + '/:' + websiteRecordIdParam;
     const websiteRecordSchema = z.object({
-        // id: z.string().optional(),
         url: z.string().url(),
         boundaryRegExp: z.string(),
         periodicity: z.coerce.number().positive(),
         label: z.string(),
         active: z.boolean(),
         tags: z.array(z.string()),
-        // executions: z.array(crawlExecutionSchema).optional(),
     });
-
-    // const websiteRecordParamsSchema = z.object({
-    //     pagination: z.object({ skip: z.number(), limit: z.number() }).optional(),
-    //     sort: z.object({ lastExecutionFirst: z.boolean().optional(), urlAscending: z.boolean().optional() }).optional(),
-    //     filter: z.object({ url: z.string().optional(), label: z.string().optional(), tags: z.array(z.string()).optional() }).optional(),
-    // });
-
     const websiteRecordParamsSchema = z
         .object({
             skip: z.coerce.number().nonnegative().optional(), // z.preprocess(s => parseInt(z.string().parse(s), 10)) z.string().regex(/^d+$/).transform(Number).optional(),

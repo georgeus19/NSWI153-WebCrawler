@@ -10,6 +10,14 @@ import { graphqlHTTP } from 'express-graphql';
 import dotenv from 'dotenv';
 import { addWebSocketServer } from './api/websocket';
 import { createGraphQLSchema } from './api/graphql';
+import swaggerUi from 'swagger-ui-express';
+// import swaggerDocument from './swagger.yaml';
+
+import YAML from 'yaml';
+import fs from 'fs';
+
+const file = fs.readFileSync('./swagger.yaml', 'utf8');
+const swaggerDocument = YAML.parse(file);
 
 dotenv.config();
 
@@ -32,6 +40,8 @@ app.use(
         graphiql: true,
     })
 );
+
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const executor = createCrawlingExecutor(mongoClient, { port: 6379, host: process.env.REDIS });
 addWebsiteRecordsApi(app, mongoClient, executor);
